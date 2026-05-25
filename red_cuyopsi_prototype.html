@@ -1,0 +1,933 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root {
+  --summit-blue:#1B3A6B;
+  --summit-mid:#2B5197;
+  --summit-soft:#D6E4F7;
+  --wine:#7A2D3B;
+  --wine-soft:#F2E0E3;
+  --jarilla:#5E7A2E;
+  --jarilla-soft:#E6EDD8;
+  --cordillera:#F4F4F1;
+  --white:#FFFFFF;
+  --text-dark:#1A1A2E;
+  --text-mid:#4A4A6A;
+  --text-muted:#8E8EA8;
+  --radius-sm:8px;
+  --radius-md:14px;
+  --radius-lg:22px;
+  --radius-pill:99px;
+}
+
+body{background:var(--cordillera);font-family:'Inter',sans-serif;color:var(--text-dark);}
+
+.phone-wrap{
+  width:380px;
+  margin:0 auto;
+  padding:0 0 24px;
+}
+
+.screen{display:none;flex-direction:column;min-height:680px;background:var(--cordillera);animation:fadeIn .25s ease;}
+.screen.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* nav tabs */
+.nav-tabs{
+  display:flex;
+  background:var(--white);
+  border-bottom:1.5px solid rgba(27,58,107,.08);
+  overflow-x:auto;
+  scrollbar-width:none;
+  gap:0;
+  flex-shrink:0;
+}
+.nav-tabs::-webkit-scrollbar{display:none;}
+.nav-tab{
+  flex:1;min-width:68px;padding:10px 4px 8px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;border:none;background:none;
+  font-family:'Inter',sans-serif;font-size:10px;color:var(--text-muted);
+  border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;
+}
+.nav-tab i{font-size:20px;}
+.nav-tab.active{color:var(--summit-blue);border-bottom-color:var(--summit-blue);font-weight:500;}
+
+/* status bar */
+.status-bar{
+  background:var(--summit-blue);
+  padding:12px 20px 8px;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-shrink:0;
+}
+.status-bar .time{color:#fff;font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;}
+.status-icons{display:flex;gap:5px;color:#fff;font-size:14px;}
+
+/* header bar */
+.header-bar{
+  background:var(--summit-blue);
+  padding:0 20px 18px;
+  flex-shrink:0;
+}
+.header-bar .greeting{color:rgba(255,255,255,.7);font-size:12px;font-family:'Inter',sans-serif;}
+.header-bar .username{color:#fff;font-family:'Poppins',sans-serif;font-size:18px;font-weight:700;}
+.header-bar .subtitle{color:rgba(255,255,255,.65);font-size:11px;margin-top:2px;}
+.header-arc{
+  background:var(--summit-blue);
+  height:20px;
+  border-radius:0 0 50% 50%/0 0 28px 28px;
+  margin-bottom:-1px;
+  flex-shrink:0;
+}
+
+/* search bar */
+.search-wrap{padding:0 16px;margin-top:-18px;margin-bottom:12px;flex-shrink:0;}
+.search-box{
+  background:var(--white);
+  border-radius:var(--radius-pill);
+  display:flex;align-items:center;
+  padding:10px 14px;gap:8px;
+  box-shadow:0 2px 12px rgba(27,58,107,.1);
+}
+.search-box input{
+  flex:1;border:none;outline:none;font-family:'Inter',sans-serif;
+  font-size:13px;color:var(--text-dark);background:none;
+}
+.search-box i{font-size:16px;color:var(--text-muted);}
+
+/* filter pills */
+.filter-row{display:flex;gap:8px;padding:0 16px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;margin-bottom:14px;}
+.filter-row::-webkit-scrollbar{display:none;}
+.pill{
+  flex-shrink:0;padding:6px 14px;border-radius:var(--radius-pill);
+  font-size:11px;font-family:'Inter',sans-serif;font-weight:500;cursor:pointer;
+  border:1.5px solid rgba(27,58,107,.18);color:var(--text-mid);background:var(--white);
+  transition:all .2s;white-space:nowrap;
+}
+.pill.active{background:var(--summit-blue);color:#fff;border-color:var(--summit-blue);}
+
+/* section label */
+.section-label{padding:0 16px 8px;font-size:11px;font-weight:600;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;}
+
+/* scrollable content area */
+.scroll-area{flex:1;overflow-y:auto;padding-bottom:8px;scrollbar-width:none;}
+.scroll-area::-webkit-scrollbar{display:none;}
+
+/* psychologist card */
+.psy-card{
+  background:var(--white);border-radius:var(--radius-md);
+  margin:0 16px 12px;padding:14px;
+  display:flex;gap:12px;align-items:flex-start;
+  cursor:pointer;transition:box-shadow .2s;
+  border:1px solid rgba(27,58,107,.06);
+}
+.psy-card:active{box-shadow:0 2px 12px rgba(27,58,107,.12);}
+.psy-avatar{
+  width:52px;height:52px;border-radius:var(--radius-sm);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:16px;color:#fff;
+}
+.psy-info{flex:1;min-width:0;}
+.psy-name{font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;color:var(--text-dark);}
+.psy-spec{font-size:11px;color:var(--wine);font-weight:500;margin:2px 0;}
+.psy-meta{display:flex;gap:10px;align-items:center;margin-top:5px;}
+.psy-meta span{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:3px;}
+.psy-meta i{font-size:13px;}
+.psy-badge{
+  font-size:10px;font-weight:600;padding:3px 9px;border-radius:var(--radius-pill);
+  flex-shrink:0;align-self:flex-start;
+}
+.badge-online{background:var(--jarilla-soft);color:#3A5A1A;}
+.badge-inperson{background:var(--summit-soft);color:var(--summit-mid);}
+.star-row{display:flex;align-items:center;gap:2px;}
+.star-row i{font-size:12px;color:#E6A817;}
+.price-tag{font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;color:var(--summit-blue);}
+
+/* map placeholder */
+.map-area{
+  margin:0 16px 12px;border-radius:var(--radius-md);
+  height:200px;background:var(--summit-soft);
+  position:relative;overflow:hidden;
+  border:1px solid rgba(27,58,107,.1);
+}
+.map-bg{
+  width:100%;height:100%;
+  background:linear-gradient(135deg,#C8D9F0 0%,#D6E8D4 50%,#E0D5C8 100%);
+  position:relative;
+}
+.map-grid{position:absolute;inset:0;opacity:.3;}
+.map-pin{
+  position:absolute;width:28px;height:28px;border-radius:50% 50% 50% 0;
+  transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;
+  border:2px solid #fff;cursor:pointer;
+}
+.map-pin i{transform:rotate(45deg);font-size:12px;color:#fff;}
+.pin-a{background:var(--summit-blue);top:30%;left:35%;}
+.pin-b{background:var(--wine);top:55%;left:60%;}
+.pin-c{background:var(--jarilla);top:20%;left:65%;}
+.map-label{position:absolute;bottom:10px;left:12px;background:rgba(255,255,255,.9);border-radius:var(--radius-sm);padding:4px 10px;font-size:11px;color:var(--text-mid);font-weight:500;}
+.view-toggle{
+  position:absolute;top:10px;right:10px;
+  display:flex;background:var(--white);border-radius:var(--radius-pill);overflow:hidden;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+.view-btn{padding:5px 10px;font-size:10px;font-weight:600;cursor:pointer;border:none;background:none;font-family:'Inter',sans-serif;color:var(--text-muted);}
+.view-btn.active{background:var(--summit-blue);color:#fff;}
+
+/* bottom nav */
+.bottom-nav{
+  background:var(--white);display:flex;
+  border-top:1px solid rgba(27,58,107,.08);
+  padding:8px 0 16px;flex-shrink:0;
+  position:sticky;bottom:0;
+}
+.bnav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;border:none;background:none;font-family:'Inter',sans-serif;
+  font-size:9px;color:var(--text-muted);padding:4px 0;transition:color .2s;
+}
+.bnav-item i{font-size:22px;}
+.bnav-item.active{color:var(--summit-blue);}
+.bnav-dot{width:5px;height:5px;background:var(--wine);border-radius:50%;position:absolute;top:4px;right:24px;}
+
+/* profile screen */
+.profile-header{
+  background:var(--summit-blue);padding:20px 20px 60px;position:relative;
+  flex-shrink:0;
+}
+.profile-header .back-btn{color:rgba(255,255,255,.7);font-size:18px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:12px;background:none;border:none;font-family:'Inter',sans-serif;}
+.profile-hero{display:flex;gap:14px;align-items:flex-start;}
+.profile-big-avatar{width:72px;height:72px;border-radius:var(--radius-md);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:22px;color:#fff;border:3px solid rgba(255,255,255,.3);}
+.profile-hero-info{flex:1;}
+.profile-hero-info h2{font-family:'Poppins',sans-serif;color:#fff;font-size:17px;font-weight:700;}
+.profile-hero-info p{color:rgba(255,255,255,.7);font-size:11px;margin-top:2px;}
+.profile-verify{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.15);padding:3px 9px;border-radius:var(--radius-pill);font-size:10px;color:#fff;margin-top:6px;}
+.profile-card-lift{
+  background:var(--white);border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  margin-top:-28px;padding:20px 16px 8px;flex:1;
+}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;}
+.stat-item{background:var(--cordillera);border-radius:var(--radius-sm);padding:10px 8px;text-align:center;}
+.stat-num{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;color:var(--summit-blue);}
+.stat-lbl{font-size:9px;color:var(--text-muted);margin-top:2px;}
+.section-title{font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;color:var(--text-dark);margin-bottom:8px;}
+.info-tag{display:inline-flex;align-items:center;gap:5px;background:var(--summit-soft);color:var(--summit-mid);font-size:11px;font-weight:500;padding:5px 11px;border-radius:var(--radius-pill);margin:3px 4px 3px 0;}
+.info-tag i{font-size:13px;}
+.modality-row{display:flex;gap:8px;margin-bottom:14px;}
+.modality-chip{flex:1;padding:10px;border-radius:var(--radius-sm);display:flex;align-items:center;gap:7px;font-size:11px;font-weight:500;}
+.chip-online{background:var(--jarilla-soft);color:#3A5A1A;}
+.chip-inperson{background:var(--wine-soft);color:var(--wine);}
+.modality-chip i{font-size:16px;}
+.book-btn{
+  width:100%;padding:15px;border-radius:var(--radius-pill);
+  background:var(--summit-blue);color:#fff;border:none;
+  font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;margin-top:8px;transition:background .2s;
+}
+.book-btn:active{background:var(--summit-mid);}
+.price-row{display:flex;justify-content:space-between;align-items:center;background:var(--cordillera);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;}
+.price-row .label{font-size:11px;color:var(--text-muted);}
+.price-row .amount{font-family:'Poppins',sans-serif;font-size:18px;font-weight:700;color:var(--summit-blue);}
+.price-row .per{font-size:10px;color:var(--text-muted);}
+.divider{height:1px;background:rgba(27,58,107,.07);margin:14px 0;}
+
+/* booking screen */
+.booking-header{background:var(--summit-blue);padding:12px 20px 18px;flex-shrink:0;}
+.booking-header .back-row{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.7);margin-bottom:10px;cursor:pointer;}
+.booking-header .back-row i{font-size:18px;color:#fff;}
+.booking-header h2{font-family:'Poppins',sans-serif;color:#fff;font-size:16px;font-weight:700;}
+.booking-header p{color:rgba(255,255,255,.65);font-size:11px;}
+.booking-body{flex:1;overflow-y:auto;padding:16px;scrollbar-width:none;}
+.booking-body::-webkit-scrollbar{display:none;}
+.cal-card{background:var(--white);border-radius:var(--radius-md);padding:14px;margin-bottom:14px;border:1px solid rgba(27,58,107,.07);}
+.cal-month{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.cal-month span{font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;color:var(--text-dark);}
+.cal-month button{background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:20px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;}
+.cal-day-name{font-size:9px;font-weight:600;color:var(--text-muted);padding:4px 0;text-transform:uppercase;}
+.cal-day{
+  width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;
+  color:var(--text-mid);transition:all .15s;
+}
+.cal-day.available:hover{background:var(--summit-soft);}
+.cal-day.selected{background:var(--summit-blue);color:#fff;font-weight:600;}
+.cal-day.past{color:var(--text-muted);opacity:.4;pointer-events:none;}
+.cal-day.today{border:1.5px solid var(--summit-blue);color:var(--summit-blue);font-weight:600;}
+.cal-day.unavailable{color:var(--text-muted);opacity:.3;pointer-events:none;}
+.time-slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.time-slot{
+  padding:9px 4px;border-radius:var(--radius-sm);text-align:center;
+  font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid rgba(27,58,107,.15);
+  color:var(--text-mid);background:var(--white);font-family:'Inter',sans-serif;
+  transition:all .15s;
+}
+.time-slot.selected{background:var(--summit-blue);color:#fff;border-color:var(--summit-blue);}
+.time-slot.unavailable{opacity:.35;pointer-events:none;background:var(--cordillera);}
+.payment-card{background:var(--white);border-radius:var(--radius-md);padding:14px;margin-bottom:14px;border:1px solid rgba(27,58,107,.07);}
+.pay-option{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(27,58,107,.06);cursor:pointer;}
+.pay-option:last-child{border-bottom:none;}
+.pay-radio{width:18px;height:18px;border-radius:50%;border:2px solid rgba(27,58,107,.25);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.pay-radio.selected{border-color:var(--summit-blue);background:var(--summit-blue);}
+.pay-radio.selected::after{content:'';width:7px;height:7px;background:#fff;border-radius:50%;}
+.pay-info{flex:1;}
+.pay-info .name{font-size:12px;font-weight:500;color:var(--text-dark);}
+.pay-info .desc{font-size:10px;color:var(--text-muted);}
+.pay-amount{font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;color:var(--summit-blue);}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;}
+.summary-row .lbl{font-size:12px;color:var(--text-muted);}
+.summary-row .val{font-size:12px;font-weight:500;color:var(--text-dark);}
+.summary-row.total .lbl{font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;color:var(--text-dark);}
+.summary-row.total .val{font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;color:var(--summit-blue);}
+.confirm-btn{
+  width:100%;padding:15px;border-radius:var(--radius-pill);
+  background:var(--jarilla);color:#fff;border:none;
+  font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;margin-top:4px;
+}
+
+/* appointments screen */
+.appt-header{background:var(--summit-blue);padding:14px 20px 18px;flex-shrink:0;}
+.appt-header h2{font-family:'Poppins',sans-serif;color:#fff;font-size:17px;font-weight:700;}
+.appt-header p{color:rgba(255,255,255,.65);font-size:11px;margin-top:2px;}
+.appt-tabs{display:flex;background:rgba(255,255,255,.12);border-radius:var(--radius-pill);padding:3px;margin-top:12px;}
+.appt-tab{flex:1;padding:6px;text-align:center;font-size:11px;font-weight:500;cursor:pointer;border-radius:var(--radius-pill);color:rgba(255,255,255,.65);transition:all .2s;}
+.appt-tab.active{background:#fff;color:var(--summit-blue);}
+.appt-card{
+  background:var(--white);border-radius:var(--radius-md);
+  margin:0 16px 12px;overflow:hidden;
+  border:1px solid rgba(27,58,107,.07);cursor:pointer;
+}
+.appt-card-top{display:flex;gap:12px;padding:12px 14px;align-items:flex-start;}
+.appt-card-avatar{width:42px;height:42px;border-radius:var(--radius-sm);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:13px;color:#fff;}
+.appt-card-info{flex:1;}
+.appt-card-info h4{font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;color:var(--text-dark);}
+.appt-card-info p{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.appt-status{font-size:10px;font-weight:600;padding:3px 9px;border-radius:var(--radius-pill);}
+.status-confirmed{background:var(--jarilla-soft);color:#3A5A1A;}
+.status-pending{background:#FFF3DC;color:#A06000;}
+.status-past{background:var(--cordillera);color:var(--text-muted);}
+.appt-card-footer{background:var(--cordillera);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;}
+.appt-card-footer span{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;}
+.appt-card-footer i{font-size:13px;}
+.appt-action-row{display:flex;gap:8px;padding:10px 14px;border-top:1px solid rgba(27,58,107,.05);}
+.appt-btn{flex:1;padding:7px;border-radius:var(--radius-pill);font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;text-align:center;}
+.appt-btn-primary{background:var(--summit-blue);color:#fff;border:none;}
+.appt-btn-secondary{background:none;border:1.5px solid rgba(27,58,107,.2);color:var(--text-mid);}
+
+/* profile settings screen */
+.settings-header{background:var(--summit-blue);padding:14px 20px 60px;flex-shrink:0;}
+.settings-header h2{font-family:'Poppins',sans-serif;color:#fff;font-size:17px;font-weight:700;}
+.settings-header p{color:rgba(255,255,255,.65);font-size:11px;margin-top:2px;}
+.settings-avatar-lift{background:var(--white);border-radius:var(--radius-lg) var(--radius-lg) 0 0;margin-top:-28px;padding:20px 16px;flex:1;}
+.settings-avatar-row{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+.big-avatar{width:64px;height:64px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:20px;color:#fff;background:var(--summit-blue);}
+.settings-name{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;color:var(--text-dark);}
+.settings-role{font-size:12px;color:var(--text-muted);}
+.edit-photo-btn{margin-top:4px;font-size:11px;color:var(--summit-mid);font-weight:500;background:none;border:none;cursor:pointer;padding:0;font-family:'Inter',sans-serif;}
+.settings-section{margin-bottom:18px;}
+.settings-section-title{font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+.settings-item{
+  background:var(--white);border:1px solid rgba(27,58,107,.07);
+  border-radius:var(--radius-sm);margin-bottom:2px;
+  display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;
+}
+.settings-item i.lead{font-size:18px;color:var(--summit-mid);width:22px;text-align:center;}
+.settings-item .item-label{flex:1;font-size:13px;color:var(--text-dark);}
+.settings-item .item-value{font-size:11px;color:var(--text-muted);}
+.settings-item i.arrow{font-size:16px;color:var(--text-muted);}
+.toggle-wrap{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;background:var(--white);border:1px solid rgba(27,58,107,.07);border-radius:var(--radius-sm);margin-bottom:2px;}
+.toggle-label{font-size:13px;color:var(--text-dark);}
+.toggle{width:38px;height:22px;background:var(--jarilla);border-radius:var(--radius-pill);position:relative;cursor:pointer;}
+.toggle::after{content:'';width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px;transition:right .2s;}
+.toggle.off{background:rgba(27,58,107,.15);}
+.toggle.off::after{right:18px;}
+
+/* success screen */
+.success-screen{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:32px 24px;
+  background:var(--cordillera);text-align:center;
+}
+.success-icon-wrap{
+  width:80px;height:80px;border-radius:50%;
+  background:var(--jarilla-soft);display:flex;align-items:center;justify-content:center;
+  margin-bottom:20px;
+}
+.success-icon-wrap i{font-size:36px;color:var(--jarilla);}
+.success-title{font-family:'Poppins',sans-serif;font-size:20px;font-weight:700;color:var(--text-dark);margin-bottom:8px;}
+.success-subtitle{font-size:13px;color:var(--text-muted);line-height:1.6;max-width:260px;}
+.receipt-card{background:var(--white);border-radius:var(--radius-md);padding:16px;width:100%;margin:20px 0;border:1px solid rgba(27,58,107,.07);}
+.receipt-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px dashed rgba(27,58,107,.08);}
+.receipt-row:last-child{border-bottom:none;}
+.receipt-row .lbl{font-size:11px;color:var(--text-muted);}
+.receipt-row .val{font-size:12px;font-weight:500;color:var(--text-dark);}
+.receipt-row.highlight .val{color:var(--jarilla);font-weight:700;}
+.home-btn{
+  width:100%;padding:14px;border-radius:var(--radius-pill);
+  background:var(--summit-blue);color:#fff;border:none;
+  font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;
+}
+</style>
+
+<h2 class="sr-only">Red CuyoPsi — high-fidelity mobile prototype with 5 screens: home, psychologist profile, booking, appointments, and settings.</h2>
+
+<div class="phone-wrap">
+
+  <!-- ===== SCREEN 1: HOME ===== -->
+  <div class="screen active" id="screen-home">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="status-icons">
+        <i class="ti ti-wifi" aria-hidden="true"></i>
+        <i class="ti ti-battery-2" aria-hidden="true"></i>
+      </div>
+    </div>
+    <div class="header-bar">
+      <p class="greeting">Buenos días 👋</p>
+      <p class="username">Valentina López</p>
+      <p class="subtitle">Mendoza, Argentina · ¿Con quién querés hablar hoy?</p>
+    </div>
+    <div class="header-arc"></div>
+
+    <div class="search-wrap">
+      <div class="search-box">
+        <i class="ti ti-search" aria-hidden="true"></i>
+        <input type="text" placeholder="Especialidad, nombre, enfoque…" readonly>
+        <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="pill active">Todos</div>
+      <div class="pill">Cognitivo-Conductual</div>
+      <div class="pill">Psicoanálisis</div>
+      <div class="pill">Online</div>
+      <div class="pill">Presencial</div>
+    </div>
+
+    <div class="map-area">
+      <div class="map-bg">
+        <div class="map-pin pin-a"><i class="ti ti-map-pin" aria-hidden="true"></i></div>
+        <div class="map-pin pin-b"><i class="ti ti-map-pin" aria-hidden="true"></i></div>
+        <div class="map-pin pin-c"><i class="ti ti-map-pin" aria-hidden="true"></i></div>
+        <div class="map-label">3 profesionales cerca</div>
+        <div class="view-toggle">
+          <button class="view-btn">Mapa</button>
+          <button class="view-btn active">Lista</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Profesionales disponibles</div>
+
+    <div class="scroll-area">
+      <div class="psy-card" onclick="goTo('screen-profile')">
+        <div class="psy-avatar" style="background:var(--summit-blue)">AM</div>
+        <div class="psy-info">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div class="psy-name">Dra. Ana Martínez</div>
+            <span class="psy-badge badge-online">Online</span>
+          </div>
+          <div class="psy-spec">Cognitivo-Conductual · Ansiedad</div>
+          <div class="psy-meta">
+            <span class="star-row">
+              <i class="ti ti-star-filled" aria-hidden="true"></i>
+              <i class="ti ti-star-filled" aria-hidden="true"></i>
+              <i class="ti ti-star-filled" aria-hidden="true"></i>
+              <i class="ti ti-star-filled" aria-hidden="true"></i>
+              <i class="ti ti-star-half-filled" aria-hidden="true"></i>
+            </span>
+            <span>4.8 (127)</span>
+            <span><i class="ti ti-clock" aria-hidden="true"></i>Hoy disponible</span>
+          </div>
+        </div>
+        <div class="price-tag">$4.200</div>
+      </div>
+
+      <div class="psy-card" onclick="goTo('screen-profile')">
+        <div class="psy-avatar" style="background:var(--wine)">CR</div>
+        <div class="psy-info">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div class="psy-name">Lic. Carlos Ríos</div>
+            <span class="psy-badge badge-inperson">Presencial</span>
+          </div>
+          <div class="psy-spec">Psicoanálisis · Pareja</div>
+          <div class="psy-meta">
+            <span class="star-row">
+              <i class="ti ti-star-filled" aria-hidden="true"></i>
+              <i class="ti ti-star-filled" aria-hidden="true"></i>
+              <i class="ti ti-star-filled" aria-hidden="true"></i>
+              <i class="ti ti-star-filled" aria-hidden="true"></i>
+              <i class="ti ti-star" aria-hidden="true"></i>
+            </span>
+            <span>4.2 (89)</span>
+            <span><i class="ti ti-map-pin" aria-hidden="true"></i>1.2 km</span>
+          </div>
+        </div>
+        <div class="price-tag">$3.800</div>
+      </div>
+
+      <div class="psy-card" onclick="goTo('screen-profile')">
+        <div class="psy-avatar" style="background:var(--jarilla)">SV</div>
+        <div class="psy-info">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div class="psy-name">Dra. Sofía Vega</div>
+            <span class="psy-badge badge-online">Online</span>
+          </div>
+          <div class="psy-spec">Sistémica · Infancia</div>
+          <div class="psy-meta">
+            <span class="star-row">
+              <i class="ti ti-star-filled" aria-hidden="true"></i>
+              <i class="ti ti-star-filled" aria-hidden="true"></i>
+              <i class="ti ti-star-filled" aria-hidden="true"></i>
+              <i class="ti ti-star-filled" aria-hidden="true"></i>
+              <i class="ti ti-star-filled" aria-hidden="true"></i>
+            </span>
+            <span>5.0 (34)</span>
+            <span><i class="ti ti-clock" aria-hidden="true"></i>Mañana</span>
+          </div>
+        </div>
+        <div class="price-tag">$4.500</div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="bnav-item active" onclick="goTo('screen-home')">
+        <i class="ti ti-home" aria-hidden="true"></i>Inicio
+      </button>
+      <button class="bnav-item" onclick="goTo('screen-appts')" style="position:relative">
+        <i class="ti ti-calendar" aria-hidden="true"></i>Turnos
+        <div class="bnav-dot"></div>
+      </button>
+      <button class="bnav-item" onclick="goTo('screen-settings')">
+        <i class="ti ti-user" aria-hidden="true"></i>Perfil
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 2: PSYCHOLOGIST PROFILE ===== -->
+  <div class="screen" id="screen-profile">
+    <div class="status-bar">
+      <span class="time">9:43</span>
+      <div class="status-icons">
+        <i class="ti ti-wifi" aria-hidden="true"></i>
+        <i class="ti ti-battery-2" aria-hidden="true"></i>
+      </div>
+    </div>
+    <div class="profile-header">
+      <button class="back-btn" onclick="goTo('screen-home')">
+        <i class="ti ti-arrow-left" aria-hidden="true"></i> Volver
+      </button>
+      <div class="profile-hero">
+        <div class="profile-big-avatar" style="background:linear-gradient(135deg,var(--summit-mid),var(--summit-blue))">AM</div>
+        <div class="profile-hero-info">
+          <h2>Dra. Ana Martínez</h2>
+          <p>MP 12.847 · Mendoza, AR</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+            <span class="profile-verify"><i class="ti ti-shield-check" aria-hidden="true"></i>Verificada</span>
+            <span class="profile-verify"><i class="ti ti-star-filled" aria-hidden="true"></i>4.8 · 127 reseñas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-card-lift" style="overflow-y:auto;scrollbar-width:none;">
+      <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-num">8+</div>
+          <div class="stat-lbl">Años exp.</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">430</div>
+          <div class="stat-lbl">Pacientes</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">98%</div>
+          <div class="stat-lbl">Puntualidad</div>
+        </div>
+      </div>
+
+      <div class="modality-row">
+        <div class="modality-chip chip-online">
+          <i class="ti ti-video" aria-hidden="true"></i>Online disponible
+        </div>
+        <div class="modality-chip chip-inperson">
+          <i class="ti ti-building" aria-hidden="true"></i>Presencial
+        </div>
+      </div>
+
+      <p class="section-title">Especialidades</p>
+      <div style="margin-bottom:14px;">
+        <span class="info-tag"><i class="ti ti-brain" aria-hidden="true"></i>Ansiedad</span>
+        <span class="info-tag"><i class="ti ti-mood-sad" aria-hidden="true"></i>Depresión</span>
+        <span class="info-tag">TCC</span>
+        <span class="info-tag">Estrés laboral</span>
+        <span class="info-tag">Adultos</span>
+      </div>
+
+      <p class="section-title">Sobre mí</p>
+      <p style="font-size:12px;color:var(--text-mid);line-height:1.65;margin-bottom:14px;">Psicóloga clínica con foco en Terapia Cognitivo-Conductual. Trabajo con adultos en procesos relacionados con ansiedad, depresión, estrés y autoestima. Atención online en todo el país y presencial en Mendoza Capital.</p>
+
+      <div class="divider"></div>
+
+      <div class="price-row">
+        <div>
+          <div class="label">Sesión individual</div>
+          <div class="per">50 minutos</div>
+        </div>
+        <div class="amount">$4.200</div>
+      </div>
+
+      <p class="section-title">Política de pago</p>
+      <div style="background:var(--cordillera);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:16px;display:flex;gap:8px;align-items:flex-start;">
+        <i class="ti ti-info-circle" style="color:var(--summit-mid);font-size:16px;margin-top:1px;" aria-hidden="true"></i>
+        <p style="font-size:11px;color:var(--text-mid);line-height:1.55;">Requiere <strong>50% de seña</strong> para confirmar el turno. El restante se abona al inicio de la sesión.</p>
+      </div>
+
+      <button class="book-btn" onclick="goTo('screen-booking')">
+        Reservar turno · $2.100
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 3: BOOKING ===== -->
+  <div class="screen" id="screen-booking">
+    <div class="status-bar">
+      <span class="time">9:45</span>
+      <div class="status-icons">
+        <i class="ti ti-wifi" aria-hidden="true"></i>
+        <i class="ti ti-battery-2" aria-hidden="true"></i>
+      </div>
+    </div>
+    <div class="booking-header">
+      <div class="back-row" onclick="goTo('screen-profile')">
+        <i class="ti ti-arrow-left" aria-hidden="true"></i>
+        <span style="font-size:12px;color:rgba(255,255,255,.7);">Dra. Ana Martínez</span>
+      </div>
+      <h2>Elegí tu turno</h2>
+      <p>Seleccioná fecha, horario y forma de pago</p>
+    </div>
+
+    <div class="booking-body">
+      <div class="cal-card">
+        <div class="cal-month">
+          <button>‹</button>
+          <span>Junio 2026</span>
+          <button>›</button>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-day-name">Do</div><div class="cal-day-name">Lu</div><div class="cal-day-name">Ma</div><div class="cal-day-name">Mi</div><div class="cal-day-name">Ju</div><div class="cal-day-name">Vi</div><div class="cal-day-name">Sá</div>
+          <div class="cal-day past">1</div><div class="cal-day past">2</div><div class="cal-day past">3</div><div class="cal-day past">4</div><div class="cal-day past">5</div><div class="cal-day past">6</div><div class="cal-day past">7</div>
+          <div class="cal-day past">8</div><div class="cal-day past">9</div><div class="cal-day past">10</div><div class="cal-day past">11</div><div class="cal-day past">12</div><div class="cal-day past">13</div><div class="cal-day past">14</div>
+          <div class="cal-day past">15</div><div class="cal-day past">16</div><div class="cal-day past">17</div><div class="cal-day past">18</div><div class="cal-day past">19</div><div class="cal-day past">20</div><div class="cal-day past">21</div>
+          <div class="cal-day past">22</div><div class="cal-day past">23</div><div class="cal-day past">24</div><div class="cal-day past">25</div><div class="cal-day today" onclick="selectDay(this)">26</div><div class="cal-day available" onclick="selectDay(this)">27</div><div class="cal-day unavailable">28</div>
+          <div class="cal-day available" onclick="selectDay(this)">29</div><div class="cal-day available" onclick="selectDay(this)">30</div>
+        </div>
+      </div>
+
+      <div class="cal-card">
+        <p class="section-title" style="margin-bottom:10px;">Horarios disponibles · Lun 26</p>
+        <div class="time-slot-grid" id="time-slots">
+          <div class="time-slot" onclick="selectSlot(this)">09:00</div>
+          <div class="time-slot unavailable">10:00</div>
+          <div class="time-slot" onclick="selectSlot(this)">11:00</div>
+          <div class="time-slot selected" onclick="selectSlot(this)">14:00</div>
+          <div class="time-slot" onclick="selectSlot(this)">15:00</div>
+          <div class="time-slot unavailable">16:00</div>
+          <div class="time-slot" onclick="selectSlot(this)">17:00</div>
+          <div class="time-slot unavailable">18:00</div>
+          <div class="time-slot" onclick="selectSlot(this)">19:00</div>
+        </div>
+      </div>
+
+      <div class="cal-card">
+        <p class="section-title" style="margin-bottom:10px;">Forma de pago</p>
+        <div class="pay-option">
+          <div class="pay-radio selected"></div>
+          <div class="pay-info">
+            <div class="name">Seña 50%</div>
+            <div class="desc">Resto en el consultorio</div>
+          </div>
+          <div class="pay-amount">$2.100</div>
+        </div>
+        <div class="pay-option" onclick="switchPay(this)">
+          <div class="pay-radio"></div>
+          <div class="pay-info">
+            <div class="name">Pago completo</div>
+            <div class="desc">Descuento incluido</div>
+          </div>
+          <div class="pay-amount">$4.200</div>
+        </div>
+      </div>
+
+      <div class="cal-card">
+        <p class="section-title" style="margin-bottom:10px;">Resumen</p>
+        <div class="summary-row"><span class="lbl">Profesional</span><span class="val">Dra. Ana Martínez</span></div>
+        <div class="summary-row"><span class="lbl">Fecha</span><span class="val">Lun 26 de jun, 14:00</span></div>
+        <div class="summary-row"><span class="lbl">Modalidad</span><span class="val">Online · Videollamada</span></div>
+        <div class="summary-row total"><span class="lbl">Total ahora</span><span class="val">$2.100</span></div>
+      </div>
+
+      <button class="confirm-btn" onclick="goTo('screen-success')">
+        Confirmar y pagar · $2.100
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 4: APPOINTMENTS ===== -->
+  <div class="screen" id="screen-appts">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="status-icons">
+        <i class="ti ti-wifi" aria-hidden="true"></i>
+        <i class="ti ti-battery-2" aria-hidden="true"></i>
+      </div>
+    </div>
+    <div class="appt-header">
+      <h2>Mis turnos</h2>
+      <p>Mendoza · Jun 2026</p>
+      <div class="appt-tabs">
+        <div class="appt-tab active">Próximos</div>
+        <div class="appt-tab">Pasados</div>
+        <div class="appt-tab">Cancelados</div>
+      </div>
+    </div>
+
+    <div class="scroll-area" style="padding-top:14px;">
+      <div class="section-label">Esta semana</div>
+
+      <div class="appt-card">
+        <div class="appt-card-top">
+          <div class="appt-card-avatar" style="background:var(--summit-blue)">AM</div>
+          <div class="appt-card-info">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <h4>Dra. Ana Martínez</h4>
+              <span class="appt-status status-confirmed">Confirmado</span>
+            </div>
+            <p>Cognitivo-Conductual · Online</p>
+          </div>
+        </div>
+        <div class="appt-card-footer">
+          <span><i class="ti ti-calendar" aria-hidden="true"></i>Lun 26 jun, 14:00</span>
+          <span><i class="ti ti-clock" aria-hidden="true"></i>50 min</span>
+          <span style="color:var(--jarilla);font-weight:600;">$2.100 señado</span>
+        </div>
+        <div class="appt-action-row">
+          <button class="appt-btn appt-btn-primary">Unirse</button>
+          <button class="appt-btn appt-btn-secondary">Reprogramar</button>
+          <button class="appt-btn appt-btn-secondary">Cancelar</button>
+        </div>
+      </div>
+
+      <div class="section-label">Próxima semana</div>
+
+      <div class="appt-card">
+        <div class="appt-card-top">
+          <div class="appt-card-avatar" style="background:var(--wine)">CR</div>
+          <div class="appt-card-info">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <h4>Lic. Carlos Ríos</h4>
+              <span class="appt-status status-pending">Pendiente pago</span>
+            </div>
+            <p>Psicoanálisis · Presencial</p>
+          </div>
+        </div>
+        <div class="appt-card-footer">
+          <span><i class="ti ti-calendar" aria-hidden="true"></i>Vie 3 jul, 10:00</span>
+          <span><i class="ti ti-map-pin" aria-hidden="true"></i>Consulta · 1.2 km</span>
+        </div>
+        <div class="appt-action-row">
+          <button class="appt-btn appt-btn-primary">Pagar seña</button>
+          <button class="appt-btn appt-btn-secondary">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="bnav-item" onclick="goTo('screen-home')">
+        <i class="ti ti-home" aria-hidden="true"></i>Inicio
+      </button>
+      <button class="bnav-item active" onclick="goTo('screen-appts')">
+        <i class="ti ti-calendar" aria-hidden="true"></i>Turnos
+      </button>
+      <button class="bnav-item" onclick="goTo('screen-settings')">
+        <i class="ti ti-user" aria-hidden="true"></i>Perfil
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 5: PROFILE SETTINGS ===== -->
+  <div class="screen" id="screen-settings">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="status-icons">
+        <i class="ti ti-wifi" aria-hidden="true"></i>
+        <i class="ti ti-battery-2" aria-hidden="true"></i>
+      </div>
+    </div>
+    <div class="settings-header">
+      <h2>Mi Perfil</h2>
+      <p>Gestioná tu cuenta y preferencias</p>
+    </div>
+
+    <div class="settings-avatar-lift" style="overflow-y:auto;scrollbar-width:none;">
+      <div class="settings-avatar-row">
+        <div class="big-avatar">VL</div>
+        <div>
+          <div class="settings-name">Valentina López</div>
+          <div class="settings-role">Paciente · Mendoza, AR</div>
+          <button class="edit-photo-btn">Cambiar foto</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Datos personales</div>
+        <div class="settings-item">
+          <i class="ti ti-user lead" aria-hidden="true"></i>
+          <span class="item-label">Nombre completo</span>
+          <span class="item-value">Valentina López</span>
+          <i class="ti ti-chevron-right arrow" aria-hidden="true"></i>
+        </div>
+        <div class="settings-item">
+          <i class="ti ti-mail lead" aria-hidden="true"></i>
+          <span class="item-label">Email</span>
+          <span class="item-value">valen@mail.com</span>
+          <i class="ti ti-chevron-right arrow" aria-hidden="true"></i>
+        </div>
+        <div class="settings-item">
+          <i class="ti ti-phone lead" aria-hidden="true"></i>
+          <span class="item-label">Teléfono</span>
+          <span class="item-value">+54 261 …</span>
+          <i class="ti ti-chevron-right arrow" aria-hidden="true"></i>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Pagos</div>
+        <div class="settings-item">
+          <i class="ti ti-credit-card lead" aria-hidden="true"></i>
+          <span class="item-label">Tarjetas guardadas</span>
+          <span class="item-value">2 tarjetas</span>
+          <i class="ti ti-chevron-right arrow" aria-hidden="true"></i>
+        </div>
+        <div class="settings-item">
+          <i class="ti ti-receipt lead" aria-hidden="true"></i>
+          <span class="item-label">Historial de pagos</span>
+          <span class="item-value"></span>
+          <i class="ti ti-chevron-right arrow" aria-hidden="true"></i>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Privacidad y notificaciones</div>
+        <div class="toggle-wrap">
+          <span class="toggle-label">Recordatorios de turno</span>
+          <div class="toggle"></div>
+        </div>
+        <div class="toggle-wrap">
+          <span class="toggle-label">Ubicación para mapa</span>
+          <div class="toggle"></div>
+        </div>
+        <div class="toggle-wrap">
+          <span class="toggle-label">Novedades y promociones</span>
+          <div class="toggle off"></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Cuenta</div>
+        <div class="settings-item">
+          <i class="ti ti-lock lead" aria-hidden="true"></i>
+          <span class="item-label">Cambiar contraseña</span>
+          <span class="item-value"></span>
+          <i class="ti ti-chevron-right arrow" aria-hidden="true"></i>
+        </div>
+        <div class="settings-item" style="cursor:pointer;">
+          <i class="ti ti-logout lead" style="color:var(--wine);" aria-hidden="true"></i>
+          <span class="item-label" style="color:var(--wine);">Cerrar sesión</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="bnav-item" onclick="goTo('screen-home')">
+        <i class="ti ti-home" aria-hidden="true"></i>Inicio
+      </button>
+      <button class="bnav-item" onclick="goTo('screen-appts')">
+        <i class="ti ti-calendar" aria-hidden="true"></i>Turnos
+      </button>
+      <button class="bnav-item active" onclick="goTo('screen-settings')">
+        <i class="ti ti-user" aria-hidden="true"></i>Perfil
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 6: SUCCESS ===== -->
+  <div class="screen" id="screen-success">
+    <div class="status-bar">
+      <span class="time">9:47</span>
+      <div class="status-icons">
+        <i class="ti ti-wifi" aria-hidden="true"></i>
+        <i class="ti ti-battery-2" aria-hidden="true"></i>
+      </div>
+    </div>
+    <div class="success-screen">
+      <div class="success-icon-wrap">
+        <i class="ti ti-check" aria-hidden="true"></i>
+      </div>
+      <p class="success-title">¡Turno confirmado!</p>
+      <p class="success-subtitle">Recibiste un comprobante por email. Encontrás tu turno en "Mis Turnos".</p>
+
+      <div class="receipt-card">
+        <div class="receipt-row">
+          <span class="lbl">Profesional</span><span class="val">Dra. Ana Martínez</span>
+        </div>
+        <div class="receipt-row">
+          <span class="lbl">Fecha</span><span class="val">Lun 26 jun, 14:00</span>
+        </div>
+        <div class="receipt-row">
+          <span class="lbl">Modalidad</span><span class="val">Online</span>
+        </div>
+        <div class="receipt-row highlight">
+          <span class="lbl">Seña pagada</span><span class="val">$2.100 ✓</span>
+        </div>
+        <div class="receipt-row">
+          <span class="lbl">Resto en sesión</span><span class="val">$2.100</span>
+        </div>
+      </div>
+
+      <button class="home-btn" onclick="goTo('screen-appts')">
+        Ver en Mis Turnos
+      </button>
+      <button style="margin-top:10px;width:100%;padding:12px;border-radius:var(--radius-pill);background:none;border:1.5px solid rgba(27,58,107,.2);color:var(--summit-blue);font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;cursor:pointer;" onclick="goTo('screen-home')">
+        Volver al inicio
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById(id).scrollTop=0;
+}
+function selectDay(el){
+  el.closest('.cal-grid').querySelectorAll('.cal-day').forEach(d=>d.classList.remove('selected','today'));
+  el.classList.add('selected');
+}
+function selectSlot(el){
+  el.closest('.time-slot-grid').querySelectorAll('.time-slot').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function switchPay(row){
+  row.closest('.cal-card').querySelectorAll('.pay-radio').forEach(r=>r.classList.remove('selected'));
+  row.querySelector('.pay-radio').classList.add('selected');
+}
+</script>
