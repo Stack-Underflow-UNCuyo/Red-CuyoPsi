@@ -2,7 +2,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
+
+import { colors } from '@/constants/colors';
 
 import { LoginScreen } from '@/features/auth/screens/LoginScreen';
 import { RegisterScreen } from '@/features/auth/screens/RegisterScreen';
@@ -17,15 +20,19 @@ import { ProfessionalSettingsScreen } from '@/features/professionalSettings/scre
 import { PatientRecordScreen } from '@/features/clinicalRecord/screens/PatientRecordScreen';
 import { MapScreen } from '@/features/search/screens/MapScreen';
 import { SearchScreen } from '@/features/search/screens/SearchScreen';
-import type { SearchStackParamList } from '@/features/search/search.types';
+import type {
+  SearchStackParamList,
+  BookingStackParamList,
+  ProfileStackParamList,
+} from '@/types/navigation.types';
 
 const queryClient = new QueryClient();
 
 const Auth = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
 const SearchStack = createNativeStackNavigator<SearchStackParamList>();
-const BookingStack = createNativeStackNavigator();
-const ProfileStack = createNativeStackNavigator();
+const BookingStack = createNativeStackNavigator<BookingStackParamList>();
+const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 
 function BookingStackNavigator() {
   return (
@@ -65,21 +72,36 @@ function ProfileStackNavigator() {
 
 function MainTabs() {
   return (
-    <Tabs.Navigator>
+    <Tabs.Navigator
+      screenOptions={({ route }) => ({
+        tabBarActiveTintColor: colors.summitBlue,
+        tabBarInactiveTintColor: colors.textMuted,
+        tabBarStyle: { borderTopColor: colors.cordilleraGray },
+        tabBarIcon: ({ focused, color, size }) => {
+          if (route.name === 'SearchTab') {
+            return <Ionicons name={focused ? 'search' : 'search-outline'} size={size} color={color} />;
+          }
+          if (route.name === 'AppointmentsTab') {
+            return <Ionicons name={focused ? 'calendar' : 'calendar-outline'} size={size} color={color} />;
+          }
+          return <Ionicons name={focused ? 'person' : 'person-outline'} size={size} color={color} />;
+        },
+      })}
+    >
       <Tabs.Screen
         name="SearchTab"
         component={SearchStackNavigator}
-        options={{ title: 'Search', headerShown: false }}
+        options={{ title: 'Buscar', headerShown: false }}
       />
       <Tabs.Screen
         name="AppointmentsTab"
         component={AppointmentsScreen}
-        options={{ title: 'Appointments' }}
+        options={{ title: 'Turnos' }}
       />
       <Tabs.Screen
         name="ProfileTab"
         component={ProfileStackNavigator}
-        options={{ title: 'Profile', headerShown: false }}
+        options={{ title: 'Perfil', headerShown: false }}
       />
     </Tabs.Navigator>
   );
@@ -90,8 +112,8 @@ export function AppNavigator() {
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
         <Auth.Navigator screenOptions={{ headerShown: false }}>
-          <Auth.Screen name="Login" component={LoginScreen} />
-          <Auth.Screen name="Register" component={RegisterScreen} />
+          {/* <Auth.Screen name="Login" component={LoginScreen} /> */}
+          {/* <Auth.Screen name="Register" component={RegisterScreen} /> */}
           {/* TODO: Replace with conditional auth-state check once auth is implemented */}
           <Auth.Screen name="Main" component={MainTabs} />
         </Auth.Navigator>

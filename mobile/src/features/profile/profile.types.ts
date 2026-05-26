@@ -1,2 +1,2 @@
-// Feature-local types (navigation params, component props).
-// Populated in Phase 3+ — do not put API entity shapes here; those live in src/types/.
+// PsychologistProfileScreen params are part of SearchStackParamList — see src/types/navigation.types.ts
+// Feature-local component prop types go here when needed

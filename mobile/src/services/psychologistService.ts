@@ -1,4 +1,4 @@
-import { listPsychologists, getPsychologist } from '@/services/apiClient';
+import { listPsychologists, getPsychologist, getPsychologistAvailability } from '@/services/apiClient';
 import type { Psychologist } from '@/types/psychologist.types';
 
 export async function fetchPsychologists(): Promise<Psychologist[]> {
@@ -7,4 +7,12 @@ export async function fetchPsychologists(): Promise<Psychologist[]> {
 
 export async function fetchPsychologistById(id: number): Promise<Psychologist> {
   return getPsychologist(id);
+}
+
+export async function fetchPsychologistAvailability(
+  id: number,
+  dateFrom: string,
+  dateTo: string,
+): Promise<unknown[]> {
+  return getPsychologistAvailability(id, dateFrom, dateTo);
 }
