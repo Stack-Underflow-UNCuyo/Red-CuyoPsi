@@ -41,7 +41,7 @@ export function useCalendarScreen() {
   const displaySlots =
     apiSlots && apiSlots.length > 0
       ? (apiSlots as string[])
-      : DEFAULT_TIME_SLOTS.map((t) => `${selectedDate}T${t}:00.000Z`);
+      : DEFAULT_TIME_SLOTS.map((t) => `${selectedDate}T${t}:00`);
 
   const handleSelectDate = (date: string) => {
     setSelectedDate(date);

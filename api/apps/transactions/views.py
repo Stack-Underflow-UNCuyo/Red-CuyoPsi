@@ -17,5 +17,8 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
 @api_view(['GET'])
 def psychologist_transactions(request, psychologist_id: int):
-    # TODO: Filter by psychologist's appointment IDs and support ?month=YYYY-MM
-    return Response([])
+    qs = Transaction.objects.filter(appointment__psychologist_id=psychologist_id)
+    month = request.query_params.get('month')
+    if month:
+        qs = qs.filter(appointment__date_time__startswith=month)
+    return Response(TransactionSerializer(qs, many=True).data)

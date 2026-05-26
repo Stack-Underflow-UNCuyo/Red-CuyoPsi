@@ -16,10 +16,16 @@ class AppointmentViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['patch'], url_path='cancel')
     def cancel(self, request, pk=None):
-        # TODO: Implement via appointments/services.py — handle notifications and refund logic
-        return Response({})
+        # TODO: move notification and refund logic to appointments/services.py
+        appointment = self.get_object()
+        appointment.status = Appointment.Status.CANCELED
+        appointment.save(update_fields=['status'])
+        return Response(AppointmentSerializer(appointment).data)
 
     @action(detail=True, methods=['patch'], url_path='confirm')
     def confirm(self, request, pk=None):
-        # TODO: Implement via appointments/services.py — validate psychologist.payment_policy first
-        return Response({})
+        # TODO: move payment_policy validation to appointments/services.py
+        appointment = self.get_object()
+        appointment.status = Appointment.Status.CONFIRMED
+        appointment.save(update_fields=['status'])
+        return Response(AppointmentSerializer(appointment).data)
