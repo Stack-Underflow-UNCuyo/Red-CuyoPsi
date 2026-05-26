@@ -1,2 +1,6 @@
-// Feature-local types (navigation params, component props).
-// Populated in Phase 3+ — do not put API entity shapes here; those live in src/types/.
+export type SearchStackParamList = {
+  Search: undefined;
+  Map: undefined;
+  PsychologistProfile: { id: number };
+  Booking: undefined;
+};

@@ -9,4 +9,10 @@ class SessionNoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SessionNote
-        fields = '__all__'
+        fields = [
+            'id',
+            'appointment_id',
+            'patient_id',
+            'date',
+            'encrypted_content',
+        ]

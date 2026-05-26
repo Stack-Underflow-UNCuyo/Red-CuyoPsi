@@ -6,4 +6,15 @@ from .models import Psychologist
 class PsychologistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Psychologist
-        fields = '__all__'
+        fields = [
+            'id',
+            'name',
+            'specialty',
+            'session_price',
+            'payment_policy',
+            'modality',
+            'rating',
+            'address',
+            'latitude',
+            'longitude',
+        ]

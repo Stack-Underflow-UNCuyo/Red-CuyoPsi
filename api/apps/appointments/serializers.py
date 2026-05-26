@@ -6,4 +6,11 @@ from .models import Appointment
 class AppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
-        fields = '__all__'
+        fields = [
+            'id',
+            'psychologist_id',
+            'patient_id',
+            'date_time',
+            'status',
+            'payment_status',
+        ]

@@ -1,6 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
 import { LoginScreen } from '@/features/auth/screens/LoginScreen';
@@ -16,10 +17,13 @@ import { ProfessionalSettingsScreen } from '@/features/professionalSettings/scre
 import { PatientRecordScreen } from '@/features/clinicalRecord/screens/PatientRecordScreen';
 import { MapScreen } from '@/features/search/screens/MapScreen';
 import { SearchScreen } from '@/features/search/screens/SearchScreen';
+import type { SearchStackParamList } from '@/features/search/search.types';
+
+const queryClient = new QueryClient();
 
 const Auth = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
-const SearchStack = createNativeStackNavigator();
+const SearchStack = createNativeStackNavigator<SearchStackParamList>();
 const BookingStack = createNativeStackNavigator();
 const ProfileStack = createNativeStackNavigator();
 
@@ -83,13 +87,15 @@ function MainTabs() {
 
 export function AppNavigator() {
   return (
-    <NavigationContainer>
-      <Auth.Navigator screenOptions={{ headerShown: false }}>
-        <Auth.Screen name="Login" component={LoginScreen} />
-        <Auth.Screen name="Register" component={RegisterScreen} />
-        {/* TODO: Replace with conditional auth-state check once auth is implemented */}
-        <Auth.Screen name="Main" component={MainTabs} />
-      </Auth.Navigator>
-    </NavigationContainer>
+    <QueryClientProvider client={queryClient}>
+      <NavigationContainer>
+        <Auth.Navigator screenOptions={{ headerShown: false }}>
+          <Auth.Screen name="Login" component={LoginScreen} />
+          <Auth.Screen name="Register" component={RegisterScreen} />
+          {/* TODO: Replace with conditional auth-state check once auth is implemented */}
+          <Auth.Screen name="Main" component={MainTabs} />
+        </Auth.Navigator>
+      </NavigationContainer>
+    </QueryClientProvider>
   );
 }
