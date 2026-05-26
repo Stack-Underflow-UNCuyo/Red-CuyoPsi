@@ -11,7 +11,7 @@ export function usePatientRecordScreen() {
   const route = useRoute<RouteProp<ProfileStackParamList, 'PatientRecord'>>();
   const { patientId } = route.params;
 
-  const { data: patient } = useQuery({
+  const { data: patient, refetch: refetchPatient } = useQuery({
     queryKey: queryKeys.patients.detail(patientId),
     queryFn: () => fetchPatientById(patientId),
   });
@@ -20,14 +20,21 @@ export function usePatientRecordScreen() {
     data: sessionNotes = [],
     isLoading,
     error,
+    refetch: refetchNotes,
+    isRefetching,
   } = useQuery({
     queryKey: queryKeys.sessionNotes.byPatient(patientId),
     queryFn: () => fetchSessionNotesByPatient(patientId),
   });
 
+  const onRefresh = () => {
+    refetchPatient();
+    refetchNotes();
+  };
+
   const sortedNotes = [...sessionNotes].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
 
-  return { patient, sessionNotes: sortedNotes, isLoading, error };
+  return { patient, sessionNotes: sortedNotes, isLoading, error, isRefreshing: isRefetching, onRefresh };
 }

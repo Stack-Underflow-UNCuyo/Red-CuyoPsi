@@ -11,4 +11,14 @@ export interface Psychologist {
   address?: string;
   latitude?: number;
   longitude?: number;
+  // Extended display fields (optional until API adds them)
+  initials?: string;
+  color?: string;
+  tags?: string[];
+  bio?: string;
+  registration?: string;
+  reviews?: number;
+  years?: number;
+  patients?: number;
+  punctuality?: number;
 }

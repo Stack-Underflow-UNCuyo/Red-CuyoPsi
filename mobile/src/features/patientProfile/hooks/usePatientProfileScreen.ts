@@ -12,7 +12,7 @@ const CURRENT_PATIENT_ID = 1;
 export function usePatientProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
 
-  const { data: patient, isLoading, error } = useQuery({
+  const { data: patient, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: queryKeys.patients.detail(CURRENT_PATIENT_ID),
     queryFn: () => fetchPatientById(CURRENT_PATIENT_ID),
   });
@@ -26,6 +26,8 @@ export function usePatientProfileScreen() {
     patient,
     isLoading,
     error,
+    isRefreshing: isRefetching,
+    onRefresh: refetch,
     handleGoToProfessionalSettings,
     handleGoToPatientRecord,
     handleGoToFinancialDashboard,

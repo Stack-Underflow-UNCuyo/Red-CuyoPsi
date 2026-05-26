@@ -2,6 +2,7 @@ import React from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,20 +12,21 @@ import {
 import { colors } from '@/constants/colors';
 import { fontFamily, fontSize, fontWeight } from '@/constants/typography';
 import { spacing } from '@/constants/spacing';
+import { Avatar, avatarColor, initialsFromName } from '@/components/ui/Avatar';
 import type { Appointment, AppointmentPaymentStatus, AppointmentStatus } from '@/types/appointment.types';
 import type { Psychologist } from '@/types/psychologist.types';
 import { useAppointmentsScreen, AppointmentTab } from '../hooks/useAppointmentsScreen';
 
-const STATUS_LABEL: Record<AppointmentStatus, string> = {
-  PENDING: 'Pendiente',
-  CONFIRMED: 'Confirmado',
-  CANCELED: 'Cancelado',
+const STATUS_COLOR: Record<AppointmentStatus, { bg: string; fg: string }> = {
+  PENDING: { bg: '#FFF3DC', fg: '#A06000' },
+  CONFIRMED: { bg: colors.jarillaSoft, fg: '#3A5A1A' },
+  CANCELED: { bg: colors.cordilleraGray, fg: colors.textMuted },
 };
 
-const STATUS_COLOR: Record<AppointmentStatus, string> = {
-  PENDING: colors.cuyoWine,
-  CONFIRMED: colors.jarillaGreen,
-  CANCELED: colors.textMuted,
+const STATUS_LABEL: Record<AppointmentStatus, string> = {
+  PENDING: 'Pendiente pago',
+  CONFIRMED: 'Confirmado',
+  CANCELED: 'Cancelado',
 };
 
 const PAYMENT_LABEL: Record<AppointmentPaymentStatus, string> = {
@@ -35,9 +37,9 @@ const PAYMENT_LABEL: Record<AppointmentPaymentStatus, string> = {
 
 function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString('es-AR', {
-    weekday: 'long',
+    weekday: 'short',
     day: 'numeric',
-    month: 'long',
+    month: 'short',
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -51,23 +53,46 @@ interface AppointmentCardProps {
 }
 
 function AppointmentCard({ appointment, psychologist, showCancel, onCancel }: AppointmentCardProps) {
+  const st = STATUS_COLOR[appointment.status];
+  const initials = psychologist
+    ? (psychologist.initials ?? initialsFromName(psychologist.name))
+    : '?';
+  const bg = psychologist?.color ?? avatarColor(initials);
+
   return (
     <View style={cardStyles.card}>
-      <View style={cardStyles.header}>
-        <Text style={cardStyles.name} numberOfLines={1}>
-          {psychologist?.name ?? 'Profesional'}
-        </Text>
-        <View style={[cardStyles.statusBadge, { backgroundColor: STATUS_COLOR[appointment.status] + '22' }]}>
-          <Text style={[cardStyles.statusText, { color: STATUS_COLOR[appointment.status] }]}>
-            {STATUS_LABEL[appointment.status]}
+      <TouchableOpacity style={cardStyles.top} activeOpacity={0.85}>
+        <Avatar initials={initials} bg={bg} size={42} borderRadius={8} />
+        <View style={cardStyles.info}>
+          <View style={cardStyles.headerRow}>
+            <Text style={cardStyles.name} numberOfLines={1}>
+              {psychologist?.name ?? 'Profesional'}
+            </Text>
+            <View style={[cardStyles.statusBadge, { backgroundColor: st.bg }]}>
+              <Text style={[cardStyles.statusText, { color: st.fg }]}>
+                {STATUS_LABEL[appointment.status]}
+              </Text>
+            </View>
+          </View>
+          <Text style={cardStyles.specialty}>
+            {psychologist?.specialty ?? ''}
           </Text>
         </View>
+      </TouchableOpacity>
+
+      <View style={cardStyles.meta}>
+        <Text style={cardStyles.dateTime}>📅 {formatDateTime(appointment.date_time)}</Text>
+        <Text style={[cardStyles.paymentText, {
+          color: appointment.payment_status !== 'PENDING'
+            ? colors.jarillaGreen
+            : appointment.status === 'PENDING' ? '#A06000' : colors.textMuted,
+        }]}>
+          {PAYMENT_LABEL[appointment.payment_status]}
+        </Text>
       </View>
-      <Text style={cardStyles.specialty}>{psychologist?.specialty ?? ''}</Text>
-      <Text style={cardStyles.dateTime}>{formatDateTime(appointment.date_time)}</Text>
-      <View style={cardStyles.footer}>
-        <Text style={cardStyles.payment}>{PAYMENT_LABEL[appointment.payment_status]}</Text>
-        {showCancel && (
+
+      {showCancel && (
+        <View style={cardStyles.actions}>
           <TouchableOpacity
             style={cardStyles.cancelButton}
             onPress={() => onCancel(appointment.id)}
@@ -75,8 +100,8 @@ function AppointmentCard({ appointment, psychologist, showCancel, onCancel }: Ap
           >
             <Text style={cardStyles.cancelText}>Cancelar</Text>
           </TouchableOpacity>
-        )}
-      </View>
+        </View>
+      )}
     </View>
   );
 }
@@ -96,6 +121,8 @@ export function AppointmentsScreen() {
     psychologistMap,
     isLoading,
     error,
+    isRefreshing,
+    onRefresh,
     handleCancel,
   } = useAppointmentsScreen();
 
@@ -110,40 +137,56 @@ export function AppointmentsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.tabBar}>
-        {TABS.map(({ key, label }) => (
-          <TouchableOpacity
-            key={key}
-            style={[styles.tab, activeTab === key && styles.tabActive]}
-            onPress={() => setActiveTab(key)}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.tabText, activeTab === key && styles.tabTextActive]}>
-              {label}
-              {counts[key] > 0 ? ` (${counts[key]})` : ''}
-            </Text>
-          </TouchableOpacity>
-        ))}
+      {/* Blue header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Mis turnos</Text>
+        <Text style={styles.headerSubtitle}>
+          {`${counts.upcoming + counts.past + counts.cancelled} turnos en total`}
+        </Text>
+
+        {/* Pill tab bar on blue background */}
+        <View style={styles.tabBar}>
+          {TABS.map(({ key, label }) => (
+            <TouchableOpacity
+              key={key}
+              style={[styles.tab, activeTab === key && styles.tabActive]}
+              onPress={() => setActiveTab(key)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.tabText, activeTab === key && styles.tabTextActive]}>
+                {label}
+                {counts[key] > 0 ? ` (${counts[key]})` : ''}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
       {isLoading ? (
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={colors.summitBlue} />
         </View>
-      ) : error ? (
-        <View style={styles.centered}>
-          <Text style={styles.errorText}>Error al cargar turnos</Text>
-        </View>
-      ) : displayedAppointments.length === 0 ? (
-        <View style={styles.centered}>
-          <Text style={styles.emptyText}>No hay turnos en esta sección</Text>
-        </View>
       ) : (
         <FlatList
           data={displayedAppointments}
           keyExtractor={(item) => String(item.id)}
           renderItem={renderItem}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={displayedAppointments.length === 0 ? styles.listEmpty : styles.list}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              colors={[colors.summitBlue]}
+              tintColor={colors.summitBlue}
+            />
+          }
+          ListEmptyComponent={
+            <View style={styles.centered}>
+              <Text style={error ? styles.errorText : styles.emptyText}>
+                {error ? 'Error al cargar turnos' : 'No hay turnos en esta sección'}
+              </Text>
+            </View>
+          }
         />
       )}
     </View>
@@ -155,31 +198,50 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.cordilleraGray,
   },
+  header: {
+    backgroundColor: colors.summitBlue,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.sm,
+  },
+  headerTitle: {
+    fontFamily: fontFamily.heading,
+    fontSize: 19,
+    fontWeight: fontWeight.bold,
+    color: colors.white,
+  },
+  headerSubtitle: {
+    fontFamily: fontFamily.body,
+    fontSize: fontSize.sm,
+    color: 'rgba(255,255,255,0.65)',
+    marginTop: 2,
+    marginBottom: spacing.sm,
+  },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.cordilleraGray,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 9999,
+    padding: 3,
   },
   tab: {
     flex: 1,
-    paddingVertical: spacing.sm,
+    paddingVertical: 7,
+    paddingHorizontal: spacing.xs,
+    borderRadius: 9999,
     alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
   },
   tabActive: {
-    borderBottomColor: colors.summitBlue,
+    backgroundColor: colors.white,
   },
   tabText: {
     fontFamily: fontFamily.body,
-    fontSize: fontSize.md,
+    fontSize: fontSize.sm,
     fontWeight: fontWeight.medium,
-    color: colors.textMuted,
+    color: 'rgba(255,255,255,0.65)',
   },
   tabTextActive: {
     color: colors.summitBlue,
-    fontWeight: fontWeight.semibold,
+    fontWeight: fontWeight.bold,
   },
   centered: {
     flex: 1,
@@ -188,6 +250,9 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: spacing.md,
+  },
+  listEmpty: {
+    flexGrow: 1,
   },
   errorText: {
     fontFamily: fontFamily.body,
@@ -204,24 +269,36 @@ const styles = StyleSheet.create({
 const cardStyles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
-    borderRadius: 12,
-    padding: spacing.md,
+    borderRadius: 14,
     marginBottom: spacing.sm,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(27,58,107,0.07)',
     shadowColor: colors.textDark,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 3,
+    elevation: 1,
   },
-  header: {
+  top: {
+    flexDirection: 'row',
+    gap: 12,
+    padding: 13,
+    alignItems: 'flex-start',
+  },
+  info: {
+    flex: 1,
+    minWidth: 0,
+  },
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
+    alignItems: 'flex-start',
+    gap: 6,
   },
   name: {
     fontFamily: fontFamily.heading,
-    fontSize: fontSize.lg,
+    fontSize: fontSize.md,
     fontWeight: fontWeight.semibold,
     color: colors.textDark,
     flex: 1,
@@ -229,48 +306,61 @@ const cardStyles = StyleSheet.create({
   statusBadge: {
     borderRadius: 6,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    marginLeft: spacing.sm,
+    paddingVertical: 2,
+    flexShrink: 0,
   },
   statusText: {
     fontFamily: fontFamily.body,
-    fontSize: fontSize.sm,
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.medium,
   },
   specialty: {
     fontFamily: fontFamily.body,
-    fontSize: fontSize.md,
+    fontSize: fontSize.xs,
     color: colors.textMuted,
-    marginBottom: spacing.xs,
+    marginTop: 3,
   },
-  dateTime: {
-    fontFamily: fontFamily.body,
-    fontSize: fontSize.base,
-    color: colors.textMid,
-    textTransform: 'capitalize',
-    marginBottom: spacing.sm,
-  },
-  footer: {
+  meta: {
+    backgroundColor: colors.cordilleraGray,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
   },
-  payment: {
+  dateTime: {
     fontFamily: fontFamily.body,
-    fontSize: fontSize.md,
-    color: colors.textMuted,
+    fontSize: fontSize.sm,
+    color: colors.textMid,
+    textTransform: 'capitalize',
+  },
+  paymentText: {
+    fontFamily: fontFamily.body,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    padding: 10,
+    paddingHorizontal: 14,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(27,58,107,0.05)',
   },
   cancelButton: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.cuyoWine,
+    flex: 1,
+    paddingVertical: 7,
+    borderRadius: 9999,
+    borderWidth: 1.5,
+    borderColor: 'rgba(27,58,107,0.2)',
+    alignItems: 'center',
   },
   cancelText: {
     fontFamily: fontFamily.body,
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.medium,
-    color: colors.cuyoWine,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.textMid,
   },
 });

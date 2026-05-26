@@ -1,5 +1,13 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors } from '@/constants/colors';
 import { fontFamily, fontSize, fontWeight } from '@/constants/typography';
@@ -17,6 +25,7 @@ function formatDateTime(isoString: string): string {
 }
 
 export function ConfirmationScreen() {
+  const insets = useSafeAreaInsets();
   const {
     appointment,
     psychologist,
@@ -36,35 +45,53 @@ export function ConfirmationScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.statusSection}>
-        <View style={[styles.iconCircle, isConfirmed ? styles.iconConfirmed : styles.iconPending]}>
-          <Text style={styles.iconText}>{isConfirmed ? '✓' : '!'}</Text>
-        </View>
-        <Text style={styles.statusTitle}>
+      {/* Blue header */}
+      <View style={[styles.header, { paddingTop: insets.top + spacing.xs }]}>
+        <Text style={styles.headerTitle}>
           {isConfirmed ? '¡Turno confirmado!' : 'Turno reservado'}
         </Text>
-        {paymentPending && <Text style={styles.statusSubtitle}>Pago pendiente</Text>}
+        <Text style={styles.headerSubtitle}>
+          {isConfirmed ? 'Tu sesión quedó agendada.' : 'Pago pendiente de confirmación.'}
+        </Text>
       </View>
 
-      <View style={styles.card}>
-        {psychologist != null && (
-          <Text style={styles.psychologistName}>{psychologist.name}</Text>
-        )}
-        <Text style={styles.dateTime}>{formatDateTime(appointment.dateTime)}</Text>
-        {paymentPending && (
-          <View style={styles.noticeBanner}>
-            <Text style={styles.noticeText}>
-              La pasarela de pago estará disponible próximamente. Podrás completar el pago desde la sección de turnos.
-            </Text>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Status icon */}
+        <View style={styles.iconWrap}>
+          <View style={[styles.iconCircle, isConfirmed ? styles.iconConfirmed : styles.iconPending]}>
+            <Text style={styles.iconText}>{isConfirmed ? '✓' : '!'}</Text>
           </View>
-        )}
+          {paymentPending && (
+            <Text style={styles.pendingLabel}>Pago pendiente</Text>
+          )}
+        </View>
+
+        {/* Appointment card */}
+        <View style={styles.card}>
+          {psychologist != null && (
+            <Text style={styles.psychologistName}>{psychologist.name}</Text>
+          )}
+          <Text style={styles.dateTime}>{formatDateTime(appointment.dateTime)}</Text>
+          {paymentPending && (
+            <View style={styles.noticeBanner}>
+              <Text style={styles.noticeText}>
+                La pasarela de pago estará disponible próximamente. Podrás completar el pago desde la sección de turnos.
+              </Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+
+      {/* Sticky footer */}
+      <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.sm }]}>
+        <TouchableOpacity style={styles.homeButton} onPress={handleGoHome} activeOpacity={0.85}>
+          <Text style={styles.homeButtonText}>Volver al inicio</Text>
+        </TouchableOpacity>
       </View>
-
-      <View style={styles.spacer} />
-
-      <TouchableOpacity style={styles.homeButton} onPress={handleGoHome} activeOpacity={0.85}>
-        <Text style={styles.homeButtonText}>Volver al inicio</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -73,7 +100,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.cordilleraGray,
-    padding: spacing.md,
   },
   centered: {
     flex: 1,
@@ -81,9 +107,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.cordilleraGray,
   },
-  statusSection: {
+  header: {
+    backgroundColor: colors.summitBlue,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
+  },
+  headerTitle: {
+    fontFamily: fontFamily.heading,
+    fontSize: 19,
+    fontWeight: fontWeight.bold,
+    color: colors.white,
+  },
+  headerSubtitle: {
+    fontFamily: fontFamily.body,
+    fontSize: fontSize.sm,
+    color: 'rgba(255,255,255,0.65)',
+    marginTop: 2,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: spacing.md,
     alignItems: 'center',
-    paddingVertical: spacing.xl,
+  },
+  iconWrap: {
+    alignItems: 'center',
+    marginTop: spacing.lg,
+    marginBottom: spacing.lg,
   },
   iconCircle: {
     width: 72,
@@ -91,7 +142,7 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   iconConfirmed: {
     backgroundColor: colors.jarillaGreen,
@@ -105,22 +156,19 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.bold,
     color: colors.white,
   },
-  statusTitle: {
-    fontFamily: fontFamily.heading,
-    fontSize: fontSize.xxl,
-    fontWeight: fontWeight.bold,
-    color: colors.textDark,
-    marginBottom: spacing.xs,
-  },
-  statusSubtitle: {
+  pendingLabel: {
     fontFamily: fontFamily.body,
     fontSize: fontSize.base,
     color: colors.cuyoWine,
+    fontWeight: fontWeight.medium,
   },
   card: {
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 14,
     padding: spacing.md,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: 'rgba(27,58,107,0.07)',
   },
   psychologistName: {
     fontFamily: fontFamily.heading,
@@ -134,27 +182,31 @@ const styles = StyleSheet.create({
     fontSize: fontSize.base,
     color: colors.textMid,
     textTransform: 'capitalize',
+    marginBottom: spacing.sm,
   },
   noticeBanner: {
     backgroundColor: colors.cuyoWineSoft,
     borderRadius: 8,
     padding: spacing.sm,
-    marginTop: spacing.md,
   },
   noticeText: {
     fontFamily: fontFamily.body,
     fontSize: fontSize.md,
     color: colors.cuyoWine,
+    lineHeight: 18,
   },
-  spacer: {
-    flex: 1,
+  footer: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+    backgroundColor: colors.white,
+    borderTopWidth: 1,
+    borderTopColor: colors.cordilleraGray,
   },
   homeButton: {
     backgroundColor: colors.summitBlue,
     borderRadius: 12,
     padding: spacing.md,
     alignItems: 'center',
-    marginBottom: spacing.md,
   },
   homeButtonText: {
     fontFamily: fontFamily.heading,

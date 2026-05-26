@@ -2,6 +2,7 @@ import React from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,6 +12,7 @@ import {
 import { colors } from '@/constants/colors';
 import { fontFamily, fontSize, fontWeight } from '@/constants/typography';
 import { spacing } from '@/constants/spacing';
+import { Avatar, avatarColor } from '@/components/ui/Avatar';
 import type { Transaction, TransactionStatus, TransactionType } from '@/types/transaction.types';
 import { useFinancialDashboardScreen } from '../hooks/useFinancialDashboardScreen';
 
@@ -19,10 +21,10 @@ const TYPE_LABEL: Record<TransactionType, string> = {
   '50_DEPOSIT': 'Anticipo 50%',
 };
 
-const STATUS_COLOR: Record<TransactionStatus, string> = {
-  SUCCESSFUL: colors.jarillaGreen,
-  FAILED: colors.cuyoWine,
-  REFUNDED: colors.textMuted,
+const STATUS_COLOR: Record<TransactionStatus, { bg: string; fg: string }> = {
+  SUCCESSFUL: { bg: colors.jarillaSoft, fg: '#3A5A1A' },
+  FAILED: { bg: colors.cuyoWineSoft, fg: colors.cuyoWine },
+  REFUNDED: { bg: colors.cordilleraGray, fg: colors.textMuted },
 };
 
 const STATUS_LABEL: Record<TransactionStatus, string> = {
@@ -39,17 +41,24 @@ function formatDate(iso: string): string {
 }
 
 function TransactionRow({ transaction }: { transaction: Transaction }) {
+  const st = STATUS_COLOR[transaction.status];
+  const label = `T${transaction.appointment_id}`;
+  const bg = transaction.status === 'SUCCESSFUL' ? colors.jarillaGreen : colors.summitMid;
+
   return (
     <View style={rowStyles.row}>
-      <View style={rowStyles.left}>
+      <Avatar initials={label} bg={bg} size={40} borderRadius={10} />
+      <View style={rowStyles.body}>
         <Text style={rowStyles.type}>{TYPE_LABEL[transaction.type]}</Text>
-        <Text style={rowStyles.id}>Turno #{transaction.appointment_id}</Text>
+        <Text style={rowStyles.meta}>{'Turno #'}{transaction.appointment_id}</Text>
       </View>
       <View style={rowStyles.right}>
         <Text style={rowStyles.amount}>${transaction.amount}</Text>
-        <Text style={[rowStyles.status, { color: STATUS_COLOR[transaction.status] }]}>
-          {STATUS_LABEL[transaction.status]}
-        </Text>
+        <View style={[rowStyles.badge, { backgroundColor: st.bg }]}>
+          <Text style={[rowStyles.badgeText, { color: st.fg }]}>
+            {STATUS_LABEL[transaction.status]}
+          </Text>
+        </View>
       </View>
     </View>
   );
@@ -60,6 +69,8 @@ export function FinancialDashboardScreen() {
     transactions,
     isLoading,
     error,
+    isRefreshing,
+    onRefresh,
     monthLabel,
     totalIncome,
     sessionCount,
@@ -67,6 +78,8 @@ export function FinancialDashboardScreen() {
     handleNextMonth,
     isCurrentMonth,
   } = useFinancialDashboardScreen();
+
+  const refundCount = transactions.filter((t: Transaction) => t.status === 'REFUNDED').length;
 
   if (isLoading) {
     return (
@@ -76,19 +89,25 @@ export function FinancialDashboardScreen() {
     );
   }
 
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>Error al cargar el panel financiero</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
+      {/* Blue header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Panel financiero</Text>
+        <Text style={styles.headerSubtitle}>Ingresos y transacciones</Text>
+
+        {/* Balance card */}
+        <View style={styles.balanceCard}>
+          <Text style={styles.balanceLabel}>Disponible para retirar</Text>
+          <Text style={styles.balanceAmount}>${totalIncome}</Text>
+          <Text style={styles.balancePeriod}>{monthLabel}</Text>
+        </View>
+      </View>
+
+      {/* Month switcher */}
       <View style={styles.monthNav}>
         <TouchableOpacity onPress={handlePrevMonth} style={styles.navArrow} activeOpacity={0.7}>
-          <Text style={styles.navArrowText}>{'<'}</Text>
+          <Text style={styles.navArrowText}>{'‹'}</Text>
         </TouchableOpacity>
         <Text style={styles.monthLabel}>{monthLabel}</Text>
         <TouchableOpacity
@@ -98,31 +117,51 @@ export function FinancialDashboardScreen() {
           disabled={isCurrentMonth}
         >
           <Text style={[styles.navArrowText, isCurrentMonth && styles.navArrowTextDisabled]}>
-            {'>'}
+            {'›'}
           </Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.summaryRow}>
-        <View style={[styles.summaryCard, styles.summaryCardLeft]}>
-          <Text style={styles.summaryValue}>${totalIncome}</Text>
-          <Text style={styles.summaryLabel}>Ingresos</Text>
+      {/* Stats row */}
+      <View style={styles.statsRow}>
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>${totalIncome}</Text>
+          <Text style={styles.statLabel}>Ingresos</Text>
         </View>
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryValue}>{sessionCount}</Text>
-          <Text style={styles.summaryLabel}>Sesiones</Text>
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>{sessionCount}</Text>
+          <Text style={styles.statLabel}>Sesiones</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>{refundCount}</Text>
+          <Text style={styles.statLabel}>Reembolsos</Text>
         </View>
       </View>
-
-      <Text style={styles.listTitle}>Transacciones</Text>
 
       <FlatList
         data={transactions}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => <TransactionRow transaction={item} />}
         contentContainerStyle={transactions.length === 0 ? styles.emptyContainer : styles.list}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            colors={[colors.summitBlue]}
+            tintColor={colors.summitBlue}
+          />
+        }
+        ListHeaderComponent={
+          transactions.length > 0 ? (
+            <Text style={styles.listTitle}>Transacciones</Text>
+          ) : null
+        }
         ListEmptyComponent={
-          <Text style={styles.emptyText}>Sin transacciones este mes</Text>
+          <View style={styles.emptyContainer}>
+            <Text style={error ? styles.errorText : styles.emptyText}>
+              {error ? 'Error al cargar el panel financiero' : 'Sin transacciones este mes'}
+            </Text>
+          </View>
         }
       />
     </View>
@@ -139,13 +178,58 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  header: {
+    backgroundColor: colors.summitBlue,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xs,
+    paddingBottom: spacing.xl,
+  },
+  headerTitle: {
+    fontFamily: fontFamily.heading,
+    fontSize: 19,
+    fontWeight: fontWeight.bold,
+    color: colors.white,
+  },
+  headerSubtitle: {
+    fontFamily: fontFamily.body,
+    fontSize: fontSize.sm,
+    color: 'rgba(255,255,255,0.65)',
+    marginTop: 2,
+    marginBottom: spacing.md,
+  },
+  balanceCard: {
+    backgroundColor: 'rgba(255,255,255,0.13)',
+    borderRadius: 14,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  balanceLabel: {
+    fontFamily: fontFamily.body,
+    fontSize: fontSize.sm,
+    color: 'rgba(255,255,255,0.7)',
+  },
+  balanceAmount: {
+    fontFamily: fontFamily.heading,
+    fontSize: 28,
+    fontWeight: fontWeight.bold,
+    color: colors.white,
+    marginTop: 4,
+  },
+  balancePeriod: {
+    fontFamily: fontFamily.body,
+    fontSize: fontSize.xs,
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: 2,
+    textTransform: 'capitalize',
+  },
   monthNav: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.white,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.xs,
     borderBottomWidth: 1,
     borderBottomColor: colors.cordilleraGray,
   },
@@ -157,7 +241,7 @@ const styles = StyleSheet.create({
   },
   navArrowText: {
     fontFamily: fontFamily.heading,
-    fontSize: fontSize.xl,
+    fontSize: fontSize.xxl,
     color: colors.summitBlue,
     fontWeight: fontWeight.bold,
   },
@@ -166,47 +250,45 @@ const styles = StyleSheet.create({
   },
   monthLabel: {
     fontFamily: fontFamily.heading,
-    fontSize: fontSize.lg,
+    fontSize: fontSize.md,
     fontWeight: fontWeight.semibold,
     color: colors.textDark,
     textTransform: 'capitalize',
   },
-  summaryRow: {
+  statsRow: {
     flexDirection: 'row',
     padding: spacing.md,
     gap: spacing.sm,
   },
-  summaryCard: {
+  statCard: {
     flex: 1,
-    backgroundColor: colors.jarillaGreen,
-    borderRadius: 12,
-    padding: spacing.md,
+    backgroundColor: colors.white,
+    borderRadius: 10,
+    padding: spacing.sm,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(27,58,107,0.07)',
   },
-  summaryCardLeft: {
-    backgroundColor: colors.summitBlue,
-  },
-  summaryValue: {
+  statValue: {
     fontFamily: fontFamily.heading,
-    fontSize: fontSize.xxl,
+    fontSize: fontSize.lg,
     fontWeight: fontWeight.bold,
-    color: colors.white,
+    color: colors.summitBlue,
   },
-  summaryLabel: {
+  statLabel: {
     fontFamily: fontFamily.body,
-    fontSize: fontSize.md,
-    color: colors.white,
-    opacity: 0.85,
-    marginTop: spacing.xs,
+    fontSize: fontSize.xs,
+    color: colors.textMuted,
+    marginTop: 2,
   },
   listTitle: {
-    fontFamily: fontFamily.heading,
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.semibold,
+    fontFamily: fontFamily.body,
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.bold,
     color: colors.textMuted,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    paddingHorizontal: spacing.md,
+    letterSpacing: 0.8,
+    paddingHorizontal: spacing.sm,
     paddingBottom: spacing.sm,
   },
   list: {
@@ -232,18 +314,21 @@ const styles = StyleSheet.create({
 const rowStyles = StyleSheet.create({
   row: {
     backgroundColor: colors.white,
-    borderRadius: 10,
-    padding: spacing.md,
+    borderRadius: 12,
+    padding: spacing.sm,
     marginBottom: spacing.sm,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(27,58,107,0.07)',
   },
-  left: {
+  body: {
     flex: 1,
   },
   right: {
     alignItems: 'flex-end',
+    gap: 4,
   },
   type: {
     fontFamily: fontFamily.body,
@@ -251,22 +336,26 @@ const rowStyles = StyleSheet.create({
     fontWeight: fontWeight.medium,
     color: colors.textDark,
   },
-  id: {
+  meta: {
     fontFamily: fontFamily.body,
-    fontSize: fontSize.md,
+    fontSize: fontSize.sm,
     color: colors.textMuted,
-    marginTop: spacing.xs,
+    marginTop: 2,
   },
   amount: {
     fontFamily: fontFamily.heading,
-    fontSize: fontSize.lg,
+    fontSize: fontSize.md,
     fontWeight: fontWeight.bold,
     color: colors.summitBlue,
   },
-  status: {
+  badge: {
+    borderRadius: 5,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+  },
+  badgeText: {
     fontFamily: fontFamily.body,
-    fontSize: fontSize.md,
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.medium,
-    marginTop: spacing.xs,
   },
 });

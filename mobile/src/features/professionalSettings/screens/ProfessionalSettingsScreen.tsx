@@ -4,25 +4,39 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 
 import { colors } from '@/constants/colors';
 import { fontFamily, fontSize, fontWeight } from '@/constants/typography';
 import { spacing } from '@/constants/spacing';
+import { Avatar, avatarColor, initialsFromName } from '@/components/ui/Avatar';
 import { useProfessionalSettingsScreen } from '../hooks/useProfessionalSettingsScreen';
 
-const MODALITY_LABEL: Record<string, string> = {
-  ONLINE: 'Online',
-  IN_PERSON: 'Presencial',
-  BOTH: 'Presencial / Online',
-};
+function HubItem({ label, value, onPress }: { label: string; value?: string; onPress?: () => void }) {
+  return (
+    <TouchableOpacity
+      style={hubStyles.item}
+      onPress={onPress}
+      activeOpacity={onPress ? 0.7 : 1}
+      disabled={!onPress}
+    >
+      <Text style={hubStyles.label}>{label}</Text>
+      {value != null && <Text style={hubStyles.value}>{value}</Text>}
+      <Text style={hubStyles.chevron}>{'›'}</Text>
+    </TouchableOpacity>
+  );
+}
 
-const PAYMENT_POLICY_LABEL: Record<string, string> = {
-  TOTAL: 'Pago total (100%)',
-  '50_DEPOSIT': 'Anticipo 50%',
-  EXTERNAL: 'Pago en consultorio',
-};
+function HubSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <View style={hubStyles.section}>
+      <Text style={hubStyles.sectionTitle}>{title}</Text>
+      <View style={hubStyles.sectionItems}>{children}</View>
+    </View>
+  );
+}
 
 export function ProfessionalSettingsScreen() {
   const { psychologist, isLoading, error } = useProfessionalSettingsScreen();
@@ -43,66 +57,94 @@ export function ProfessionalSettingsScreen() {
     );
   }
 
+  const initials = psychologist.initials ?? initialsFromName(psychologist.name);
+  const avatarBg = psychologist.color ?? avatarColor(initials);
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Perfil público</Text>
-        <View style={styles.row}>
-          <Text style={styles.rowLabel}>Nombre</Text>
-          <Text style={styles.rowValue}>{psychologist.name}</Text>
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.rowLabel}>Especialidad</Text>
-          <Text style={styles.rowValue}>{psychologist.specialty}</Text>
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.rowLabel}>Modalidad</Text>
-          <Text style={styles.rowValue}>{MODALITY_LABEL[psychologist.modality] ?? psychologist.modality}</Text>
-        </View>
-        {psychologist.address != null && (
-          <View style={styles.row}>
-            <Text style={styles.rowLabel}>Consultorio</Text>
-            <Text style={styles.rowValue}>{psychologist.address}</Text>
-          </View>
-        )}
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Mi perfil</Text>
+        <Text style={styles.headerSubtitle}>Configuración profesional y herramientas</Text>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Tarifas y pagos</Text>
-        <View style={styles.row}>
-          <Text style={styles.rowLabel}>Honorario</Text>
-          <Text style={[styles.rowValue, styles.price]}>${psychologist.session_price}</Text>
-        </View>
-        <View style={styles.rowLast}>
-          <Text style={styles.rowLabel}>Política de pago</Text>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>
-              {PAYMENT_POLICY_LABEL[psychologist.payment_policy] ?? psychologist.payment_policy}
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Avatar row */}
+        <View style={styles.avatarRow}>
+          <View style={styles.avatarWrap}>
+            <Avatar initials={initials} bg={avatarBg} size={64} borderRadius={14} />
+            <View style={styles.verifiedDot}>
+              <Text style={styles.verifiedIcon}>{'✓'}</Text>
+            </View>
+          </View>
+          <View style={styles.avatarInfo}>
+            <Text style={styles.userName}>{psychologist.name}</Text>
+            <Text style={styles.userMeta}>
+              {psychologist.registration != null
+                ? `${psychologist.registration} · ${psychologist.specialty}`
+                : psychologist.specialty}
             </Text>
           </View>
         </View>
-      </View>
 
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Ubicación</Text>
-        {psychologist.latitude != null && psychologist.longitude != null ? (
-          <View style={styles.rowLast}>
-            <Text style={styles.rowLabel}>Coordenadas</Text>
-            <Text style={styles.rowValue}>
-              {psychologist.latitude.toFixed(4)}, {psychologist.longitude.toFixed(4)}
-            </Text>
+        {/* Role switch tile */}
+        <TouchableOpacity style={styles.roleSwitchCard} activeOpacity={0.85}>
+          <View style={styles.roleSwitchIcon}>
+            <Text style={styles.roleSwitchIconText}>{'⇄'}</Text>
           </View>
-        ) : (
-          <Text style={styles.mutedNote}>Sin ubicación configurada</Text>
-        )}
-      </View>
+          <View style={styles.roleSwitchText}>
+            <Text style={styles.roleSwitchTitle}>Ver como paciente</Text>
+            <Text style={styles.roleSwitchSubtitle}>Cambiá a la vista de usuario</Text>
+          </View>
+          <Text style={styles.roleSwitchChevron}>{'›'}</Text>
+        </TouchableOpacity>
 
-      <View style={styles.noticeBanner}>
-        <Text style={styles.noticeText}>
-          La edición del perfil estará disponible en la próxima versión.
-        </Text>
-      </View>
-    </ScrollView>
+        <HubSection title="Práctica">
+          <HubItem
+            label="Modalidad"
+            value={psychologist.modality === 'ONLINE' ? 'Online' : psychologist.modality === 'IN_PERSON' ? 'Presencial' : 'Presencial / Online'}
+          />
+          <HubItem label="Honorario" value={`$${psychologist.session_price}`} />
+          <HubItem
+            label="Política de pago"
+            value={psychologist.payment_policy === 'TOTAL' ? 'Pago total' : psychologist.payment_policy === '50_DEPOSIT' ? 'Anticipo 50%' : 'En consultorio'}
+          />
+        </HubSection>
+
+        <HubSection title="Información actual">
+          {psychologist.tags != null && psychologist.tags.length > 0 && (
+            <HubItem label="Especialidades" value={psychologist.tags.slice(0, 2).join(', ')} />
+          )}
+          {psychologist.address != null && (
+            <HubItem label="Consultorio" value={psychologist.address} />
+          )}
+          <HubItem label="Perfil público" />
+        </HubSection>
+
+        <HubSection title="Pacientes y clínica">
+          <HubItem label="Registro clínico" />
+          <HubItem label="Notas de sesión" />
+        </HubSection>
+
+        <HubSection title="Finanzas">
+          <HubItem label="Mis ingresos" />
+          <HubItem label="Historial de transacciones" />
+        </HubSection>
+
+        {/* Notice banner */}
+        <View style={styles.noticeBanner}>
+          <Text style={styles.noticeIcon}>{'ℹ'}</Text>
+          <Text style={styles.noticeText}>
+            La edición del perfil estará disponible en la próxima versión.
+          </Text>
+        </View>
+
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
+    </View>
   );
 }
 
@@ -110,10 +152,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.cordilleraGray,
-  },
-  content: {
-    padding: spacing.md,
-    paddingBottom: spacing.xl,
   },
   centered: {
     flex: 1,
@@ -126,83 +164,186 @@ const styles = StyleSheet.create({
     fontSize: fontSize.base,
     color: colors.cuyoWine,
   },
-  card: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-    marginBottom: spacing.md,
+  header: {
+    backgroundColor: colors.summitBlue,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xs,
+    paddingBottom: spacing.xl,
   },
-  sectionTitle: {
+  headerTitle: {
+    fontFamily: fontFamily.heading,
+    fontSize: 19,
+    fontWeight: fontWeight.bold,
+    color: colors.white,
+  },
+  headerSubtitle: {
+    fontFamily: fontFamily.body,
+    fontSize: fontSize.sm,
+    color: 'rgba(255,255,255,0.65)',
+    marginTop: 2,
+  },
+  scroll: {
+    flex: 1,
+    backgroundColor: colors.white,
+    borderRadius: 22,
+    marginTop: -22,
+  },
+  scrollContent: {
+    padding: spacing.md,
+    paddingTop: spacing.lg,
+  },
+  avatarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    marginBottom: 22,
+  },
+  avatarWrap: {
+    position: 'relative',
+  },
+  verifiedDot: {
+    position: 'absolute',
+    bottom: -3,
+    right: -3,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: colors.jarillaGreen,
+    borderWidth: 2,
+    borderColor: colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  verifiedIcon: {
+    color: colors.white,
+    fontSize: 9,
+    fontWeight: fontWeight.bold,
+  },
+  avatarInfo: {
+    flex: 1,
+  },
+  userName: {
+    fontFamily: fontFamily.heading,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: colors.textDark,
+  },
+  userMeta: {
+    fontFamily: fontFamily.body,
+    fontSize: fontSize.md,
+    color: colors.textMuted,
+    marginTop: 2,
+  },
+  roleSwitchCard: {
+    backgroundColor: colors.summitMid,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 22,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  roleSwitchIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  roleSwitchIconText: {
+    fontSize: 18,
+    color: colors.white,
+  },
+  roleSwitchText: {
+    flex: 1,
+  },
+  roleSwitchTitle: {
     fontFamily: fontFamily.heading,
     fontSize: fontSize.md,
     fontWeight: fontWeight.semibold,
-    color: colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: spacing.sm,
+    color: colors.white,
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.cordilleraGray,
-  },
-  rowLast: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.xs,
-  },
-  rowLabel: {
+  roleSwitchSubtitle: {
     fontFamily: fontFamily.body,
-    fontSize: fontSize.base,
-    color: colors.textMuted,
+    fontSize: fontSize.sm,
+    color: 'rgba(255,255,255,0.7)',
+    marginTop: 1,
   },
-  rowValue: {
-    fontFamily: fontFamily.body,
-    fontSize: fontSize.base,
-    color: colors.textDark,
-    fontWeight: fontWeight.medium,
-    flex: 1,
-    textAlign: 'right',
-    marginLeft: spacing.md,
-  },
-  price: {
-    color: colors.summitBlue,
-    fontFamily: fontFamily.heading,
+  roleSwitchChevron: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 20,
     fontWeight: fontWeight.bold,
   },
-  badge: {
-    backgroundColor: colors.summitSoft,
-    borderRadius: 8,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-  },
-  badgeText: {
-    fontFamily: fontFamily.body,
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.medium,
-    color: colors.summitMid,
-  },
-  mutedNote: {
-    fontFamily: fontFamily.body,
-    fontSize: fontSize.base,
-    color: colors.textMuted,
-    paddingVertical: spacing.sm,
-  },
   noticeBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
     backgroundColor: colors.summitSoft,
-    borderRadius: 8,
+    borderRadius: 10,
     padding: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  noticeIcon: {
+    fontSize: 14,
+    color: colors.summitMid,
+    marginTop: 1,
   },
   noticeText: {
     fontFamily: fontFamily.body,
-    fontSize: fontSize.md,
+    fontSize: fontSize.sm,
     color: colors.summitMid,
-    textAlign: 'center',
+    flex: 1,
+    lineHeight: 18,
+  },
+  bottomSpacer: {
+    height: spacing.lg,
+  },
+});
+
+const hubStyles = StyleSheet.create({
+  section: {
+    marginBottom: 18,
+  },
+  sectionTitle: {
+    fontFamily: fontFamily.body,
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.bold,
+    color: colors.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: spacing.sm,
+  },
+  sectionItems: {
+    gap: 2,
+  },
+  item: {
+    backgroundColor: colors.white,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 11,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(27,58,107,0.07)',
+  },
+  label: {
+    fontFamily: fontFamily.body,
+    fontSize: fontSize.md,
+    color: colors.textDark,
+    flex: 1,
+  },
+  value: {
+    fontFamily: fontFamily.body,
+    fontSize: fontSize.sm,
+    color: colors.textMuted,
+    textAlign: 'right',
+    marginRight: spacing.sm,
+    flexShrink: 1,
+  },
+  chevron: {
+    color: colors.textMuted,
+    fontSize: 18,
+    lineHeight: 22,
   },
 });

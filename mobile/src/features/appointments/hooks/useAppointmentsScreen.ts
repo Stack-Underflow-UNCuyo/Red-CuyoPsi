@@ -33,15 +33,22 @@ export function useAppointmentsScreen() {
     data: appointments = [],
     isLoading,
     error,
+    refetch,
+    isRefetching,
   } = useQuery({
     queryKey: queryKeys.appointments.byPatient(CURRENT_PATIENT_ID),
     queryFn: () => fetchPatientAppointments(CURRENT_PATIENT_ID),
   });
 
-  const { data: psychologists = [] } = useQuery({
+  const { data: psychologists = [], refetch: refetchPsychologists } = useQuery({
     queryKey: queryKeys.psychologists.list(),
     queryFn: fetchPsychologists,
   });
+
+  const onRefresh = () => {
+    refetch();
+    refetchPsychologists();
+  };
 
   const psychologistMap: Record<number, Psychologist> = Object.fromEntries(
     psychologists.map((p) => [p.id, p]),
@@ -70,6 +77,8 @@ export function useAppointmentsScreen() {
     psychologistMap,
     isLoading,
     error,
+    isRefreshing: isRefetching,
+    onRefresh,
     handleCancel,
   };
 }

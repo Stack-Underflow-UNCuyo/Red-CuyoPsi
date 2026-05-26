@@ -37,6 +37,8 @@ export function useFinancialDashboardScreen() {
     data: transactions = [],
     isLoading,
     error,
+    refetch,
+    isRefetching,
   } = useQuery({
     queryKey: queryKeys.psychologists.transactions(CURRENT_PSYCHOLOGIST_ID, selectedMonth),
     queryFn: () => fetchPsychologistTransactions(CURRENT_PSYCHOLOGIST_ID, selectedMonth),
@@ -51,6 +53,8 @@ export function useFinancialDashboardScreen() {
     transactions,
     isLoading,
     error,
+    isRefreshing: isRefetching,
+    onRefresh: refetch,
     selectedMonth,
     monthLabel: formatMonthLabel(selectedMonth),
     totalIncome,

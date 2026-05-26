@@ -12,7 +12,7 @@ export function usePsychologistProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<SearchStackParamList>>();
   const { id } = route.params;
 
-  const { data: psychologist, isLoading, error } = useQuery({
+  const { data: psychologist, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: queryKeys.psychologists.detail(id),
     queryFn: () => fetchPsychologistById(id),
   });
@@ -24,5 +24,5 @@ export function usePsychologistProfileScreen() {
     });
   };
 
-  return { psychologist, isLoading, error, handleReservar };
+  return { psychologist, isLoading, error, isRefreshing: isRefetching, onRefresh: refetch, handleReservar };
 }
