@@ -2,3 +2,82 @@ brand_manual.md
 database_manual.md
 user_manual.md
 red_cuyopsi_protype.html
+
+# ── General ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ── Editors ──────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+
+# ── Environment / secrets ─────────────────────────────────────────────────────
+# Never commit real env files — use .env.example as the template
+.env
+.env.local
+.env.*.local
+
+# ── Python / Django (api/) ────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+.Python
+
+# Django runtime artefacts
+api/db.sqlite3
+api/staticfiles/
+api/media/
+*.log
+
+# Packaging
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# ── Node / Expo / React Native (mobile/) ─────────────────────────────────────
+node_modules/
+.expo/
+.expo-shared/
+web-build/
+
+# Expo build outputs
+mobile/dist/
+mobile/build/
+
+# Metro bundler cache
+.metro-health-check*
+
+# NPM / Yarn logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Mobile signing / certificates ────────────────────────────────────────────
+*.jks
+*.keystore
+*.p8
+*.p12
+*.mobileprovision
+*.pem
+*.key
+google-services.json
+GoogleService-Info.plist
