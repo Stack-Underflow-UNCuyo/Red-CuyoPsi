@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors } from '@/constants/colors';
 import { fontFamily, fontSize, fontWeight } from '@/constants/typography';
 import { spacing } from '@/constants/spacing';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { useCalendarScreen } from '../hooks/useCalendarScreen';
 
 const DAY_HEADERS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
@@ -33,7 +33,6 @@ function formatSlotTime(isoSlot: string): string {
 }
 
 export function CalendarScreen() {
-  const insets = useSafeAreaInsets();
   const {
     availableDates,
     selectedDate,
@@ -65,11 +64,11 @@ export function CalendarScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Blue header — paddingTop clears the device status bar */}
-        <View style={[styles.header, { paddingTop: insets.top + spacing.xs }]}>
-          <Text style={styles.headerTitle}>Elegí un horario</Text>
-          <Text style={styles.headerSubtitle}>Seleccioná el día y hora que prefieras</Text>
-        </View>
+        <ScreenHeader
+          title="Elegí un horario"
+          subtitle="Seleccioná el día y hora que prefieras"
+          withSafeArea
+        />
 
         {/* Calendar card */}
         <View style={styles.calendarCard}>
@@ -199,23 +198,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: spacing.sm,
-  },
-  header: {
-    backgroundColor: colors.summitBlue,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
-  },
-  headerTitle: {
-    fontFamily: fontFamily.heading,
-    fontSize: 19,
-    fontWeight: fontWeight.bold,
-    color: colors.white,
-  },
-  headerSubtitle: {
-    fontFamily: fontFamily.body,
-    fontSize: fontSize.sm,
-    color: 'rgba(255,255,255,0.65)',
-    marginTop: 2,
   },
   calendarCard: {
     backgroundColor: colors.white,

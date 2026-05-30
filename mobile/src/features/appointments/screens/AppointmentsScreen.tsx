@@ -12,6 +12,7 @@ import {
 import { colors } from '@/constants/colors';
 import { fontFamily, fontSize, fontWeight } from '@/constants/typography';
 import { spacing } from '@/constants/spacing';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { Avatar, avatarColor, initialsFromName } from '@/components/ui/Avatar';
 import type { Appointment, AppointmentPaymentStatus, AppointmentStatus } from '@/types/appointment.types';
 import type { Psychologist } from '@/types/psychologist.types';
@@ -137,14 +138,10 @@ export function AppointmentsScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Blue header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Mis turnos</Text>
-        <Text style={styles.headerSubtitle}>
-          {`${counts.upcoming + counts.past + counts.cancelled} turnos en total`}
-        </Text>
-
-        {/* Pill tab bar on blue background */}
+      <ScreenHeader
+        title="Mis turnos"
+        subtitle={`${counts.upcoming + counts.past + counts.cancelled} turnos en total`}
+      >
         <View style={styles.tabBar}>
           {TABS.map(({ key, label }) => (
             <TouchableOpacity
@@ -160,7 +157,7 @@ export function AppointmentsScreen() {
             </TouchableOpacity>
           ))}
         </View>
-      </View>
+      </ScreenHeader>
 
       {isLoading ? (
         <View style={styles.centered}>
@@ -198,26 +195,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.cordilleraGray,
   },
-  header: {
-    backgroundColor: colors.summitBlue,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.sm,
-  },
-  headerTitle: {
-    fontFamily: fontFamily.heading,
-    fontSize: 19,
-    fontWeight: fontWeight.bold,
-    color: colors.white,
-  },
-  headerSubtitle: {
-    fontFamily: fontFamily.body,
-    fontSize: fontSize.sm,
-    color: 'rgba(255,255,255,0.65)',
-    marginTop: 2,
-    marginBottom: spacing.sm,
-  },
   tabBar: {
+    marginTop: spacing.sm,
     flexDirection: 'row',
     backgroundColor: 'rgba(255,255,255,0.12)',
     borderRadius: 9999,

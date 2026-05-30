@@ -33,6 +33,9 @@ __pycache__/
 venv/
 env/
 .Python
+CLAUDE.md
+red_cuyopsi_protype.html
+
 
 # Django runtime artefacts
 api/db.sqlite3

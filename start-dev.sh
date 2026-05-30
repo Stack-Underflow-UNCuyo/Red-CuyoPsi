@@ -18,10 +18,10 @@ echo "==> Updated mobile/.env.local"
 echo ""
 
 # ── API ───────────────────────────────────────────────────────────────────────
-echo "==> Starting Django API on 0.0.0.0:8000 ..."
+echo "==> Starting Django API on 0.0.0.0:8002 ..."
 cd "$REPO/api"
 source .venv/bin/activate
-python manage.py runserver 0.0.0.0:8000 &
+python manage.py runserver 0.0.0.0:8002 &
 API_PID=$!
 cd "$REPO"
 

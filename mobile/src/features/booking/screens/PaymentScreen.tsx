@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '@/constants/colors';
 import { fontFamily, fontSize, fontWeight } from '@/constants/typography';
 import { spacing } from '@/constants/spacing';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { usePaymentScreen } from '../hooks/usePaymentScreen';
 
 function formatDateTime(isoString: string): string {
@@ -65,11 +66,7 @@ export function PaymentScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Blue header */}
-      <View style={[styles.header, { paddingTop: insets.top + spacing.xs }]}>
-        <Text style={styles.headerTitle}>Confirmá tu turno</Text>
-        <Text style={styles.headerSubtitle}>Revisá los detalles antes de reservar</Text>
-      </View>
+      <ScreenHeader title="Confirmá tu turno" subtitle="Revisá los detalles antes de reservar" withSafeArea />
 
       <ScrollView
         style={styles.scroll}
@@ -129,23 +126,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.cordilleraGray,
-  },
-  header: {
-    backgroundColor: colors.summitBlue,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
-  },
-  headerTitle: {
-    fontFamily: fontFamily.heading,
-    fontSize: 19,
-    fontWeight: fontWeight.bold,
-    color: colors.white,
-  },
-  headerSubtitle: {
-    fontFamily: fontFamily.body,
-    fontSize: fontSize.sm,
-    color: 'rgba(255,255,255,0.65)',
-    marginTop: 2,
   },
   scroll: {
     flex: 1,

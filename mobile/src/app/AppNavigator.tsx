@@ -47,7 +47,7 @@ function BookingStackNavigator() {
 function SearchStackNavigator() {
   return (
     <SearchStack.Navigator>
-      <SearchStack.Screen name="Search" component={SearchScreen} options={{ title: 'Buscar profesional' }} />
+      <SearchStack.Screen name="Search" component={SearchScreen} options={{ title: 'CuyoPsi' }} />
       <SearchStack.Screen name="Map" component={MapScreen} options={{ title: 'Mapa' }} />
       <SearchStack.Screen
         name="PsychologistProfile"

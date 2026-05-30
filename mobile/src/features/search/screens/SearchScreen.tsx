@@ -14,6 +14,7 @@ import {
 import { colors } from '@/constants/colors';
 import { fontFamily, fontSize, fontWeight } from '@/constants/typography';
 import { spacing } from '@/constants/spacing';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import type { Psychologist } from '@/types/psychologist.types';
 import { PsychologistCard } from '../components/PsychologistCard';
 import { useSearchScreen } from '../hooks/useSearchScreen';
@@ -57,11 +58,7 @@ export function SearchScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Brand header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>CuyoPsi</Text>
-        <Text style={styles.headerSubtitle}>¿Con quién te gustaría hablar hoy?</Text>
-      </View>
+      <ScreenHeader title="CuyoPsi" subtitle="¿Con quién te gustaría hablar hoy?" />
 
       {/* Search bar */}
       <View style={styles.searchWrap}>
@@ -140,24 +137,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.cordilleraGray,
-  },
-  header: {
-    backgroundColor: colors.summitBlue,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: 36,
-  },
-  headerTitle: {
-    fontFamily: fontFamily.heading,
-    fontSize: fontSize.display,
-    fontWeight: fontWeight.bold,
-    color: colors.white,
-  },
-  headerSubtitle: {
-    fontFamily: fontFamily.body,
-    fontSize: fontSize.md,
-    color: 'rgba(255,255,255,0.7)',
-    marginTop: 2,
   },
   searchWrap: {
     paddingHorizontal: spacing.md,

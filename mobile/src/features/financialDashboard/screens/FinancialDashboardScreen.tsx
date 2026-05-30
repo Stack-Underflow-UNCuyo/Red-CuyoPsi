@@ -12,6 +12,7 @@ import {
 import { colors } from '@/constants/colors';
 import { fontFamily, fontSize, fontWeight } from '@/constants/typography';
 import { spacing } from '@/constants/spacing';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { Avatar, avatarColor } from '@/components/ui/Avatar';
 import type { Transaction, TransactionStatus, TransactionType } from '@/types/transaction.types';
 import { useFinancialDashboardScreen } from '../hooks/useFinancialDashboardScreen';
@@ -91,18 +92,13 @@ export function FinancialDashboardScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Blue header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Panel financiero</Text>
-        <Text style={styles.headerSubtitle}>Ingresos y transacciones</Text>
-
-        {/* Balance card */}
+      <ScreenHeader title="Panel financiero" subtitle="Ingresos y transacciones">
         <View style={styles.balanceCard}>
           <Text style={styles.balanceLabel}>Disponible para retirar</Text>
           <Text style={styles.balanceAmount}>${totalIncome}</Text>
           <Text style={styles.balancePeriod}>{monthLabel}</Text>
         </View>
-      </View>
+      </ScreenHeader>
 
       {/* Month switcher */}
       <View style={styles.monthNav}>
@@ -178,26 +174,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  header: {
-    backgroundColor: colors.summitBlue,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.xl,
-  },
-  headerTitle: {
-    fontFamily: fontFamily.heading,
-    fontSize: 19,
-    fontWeight: fontWeight.bold,
-    color: colors.white,
-  },
-  headerSubtitle: {
-    fontFamily: fontFamily.body,
-    fontSize: fontSize.sm,
-    color: 'rgba(255,255,255,0.65)',
-    marginTop: 2,
-    marginBottom: spacing.md,
-  },
   balanceCard: {
+    marginTop: spacing.md,
     backgroundColor: 'rgba(255,255,255,0.13)',
     borderRadius: 14,
     padding: spacing.md,

@@ -6,7 +6,7 @@ import type { Psychologist } from '@/types/psychologist.types';
 import type { SessionNote } from '@/types/session_note.types';
 import type { Transaction } from '@/types/transaction.types';
 
-const BASE_URL = `http://${process.env.EXPO_PUBLIC_API_HOST ?? 'localhost'}:8000/api/v1`;
+const BASE_URL = `http://${process.env.EXPO_PUBLIC_API_HOST ?? 'localhost'}:8002/api/v1`;
 
 const client = axios.create({
   baseURL: BASE_URL,

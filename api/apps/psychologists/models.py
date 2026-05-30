@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -12,6 +13,13 @@ class Psychologist(models.Model):
         IN_PERSON = 'IN_PERSON', 'In-person'
         BOTH = 'BOTH', 'Both'
 
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='psychologist_profile',
+    )
     name = models.CharField(max_length=255)
     specialty = models.CharField(max_length=255)
     session_price = models.DecimalField(max_digits=10, decimal_places=2)

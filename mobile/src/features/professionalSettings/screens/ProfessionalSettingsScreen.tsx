@@ -11,6 +11,7 @@ import {
 import { colors } from '@/constants/colors';
 import { fontFamily, fontSize, fontWeight } from '@/constants/typography';
 import { spacing } from '@/constants/spacing';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { Avatar, avatarColor, initialsFromName } from '@/components/ui/Avatar';
 import { useProfessionalSettingsScreen } from '../hooks/useProfessionalSettingsScreen';
 
@@ -62,10 +63,7 @@ export function ProfessionalSettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Mi perfil</Text>
-        <Text style={styles.headerSubtitle}>Configuración profesional y herramientas</Text>
-      </View>
+      <ScreenHeader title="Mi perfil" subtitle="Configuración profesional y herramientas" />
 
       <ScrollView
         style={styles.scroll}
@@ -163,24 +161,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.body,
     fontSize: fontSize.base,
     color: colors.cuyoWine,
-  },
-  header: {
-    backgroundColor: colors.summitBlue,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.xl,
-  },
-  headerTitle: {
-    fontFamily: fontFamily.heading,
-    fontSize: 19,
-    fontWeight: fontWeight.bold,
-    color: colors.white,
-  },
-  headerSubtitle: {
-    fontFamily: fontFamily.body,
-    fontSize: fontSize.sm,
-    color: 'rgba(255,255,255,0.65)',
-    marginTop: 2,
   },
   scroll: {
     flex: 1,

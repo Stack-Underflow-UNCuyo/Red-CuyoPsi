@@ -11,6 +11,7 @@ import {
 import { colors } from '@/constants/colors';
 import { fontFamily, fontSize, fontWeight } from '@/constants/typography';
 import { spacing } from '@/constants/spacing';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { Avatar, avatarColor, initialsFromName } from '@/components/ui/Avatar';
 import type { SessionNote } from '@/types/session_note.types';
 import { usePatientRecordScreen } from '../hooks/usePatientRecordScreen';
@@ -55,18 +56,14 @@ export function PatientRecordScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Blue header */}
-      <View style={styles.header}>
+      <ScreenHeader title="Historial clínico" subtitle={patient?.name ?? 'Paciente'}>
         <View style={styles.headerRow}>
-          <Avatar initials={initials} bg={avatarBg} size={52} borderRadius={12} />
-          <View style={styles.headerInfo}>
-            <Text style={styles.patientName}>{patient?.name ?? 'Paciente'}</Text>
-            <Text style={styles.patientMeta}>
-              {patient != null ? `${patient.email} · ${patient.phone}` : ''}
-            </Text>
-          </View>
+          <Avatar initials={initials} bg={avatarBg} size={40} borderRadius={10} />
+          <Text style={styles.patientMeta}>
+            {patient != null ? `${patient.email} · ${patient.phone}` : ''}
+          </Text>
         </View>
-      </View>
+      </ScreenHeader>
 
       {/* Privacy banner */}
       <View style={styles.privacyBanner}>
@@ -119,31 +116,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: spacing.xl,
   },
-  header: {
-    backgroundColor: colors.summitBlue,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
-  },
-  headerInfo: {
-    flex: 1,
-  },
-  patientName: {
-    fontFamily: fontFamily.heading,
-    fontSize: fontSize.lg,
-    fontWeight: fontWeight.bold,
-    color: colors.white,
+    gap: 12,
+    marginTop: spacing.sm,
   },
   patientMeta: {
     fontFamily: fontFamily.body,
     fontSize: fontSize.sm,
     color: 'rgba(255,255,255,0.65)',
-    marginTop: 2,
+    flex: 1,
   },
   privacyBanner: {
     flexDirection: 'row',
